@@ -59,11 +59,15 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}.btn-row button{flex:1;min-width:120px}
 .inline-switch{display:flex;gap:6px;flex-wrap:wrap}.inline-switch button{padding:8px 10px;background:var(--soft);color:var(--accent-deep)}.inline-switch button.active{background:var(--accent-strong);color:#fff}
 .water-panel{background:linear-gradient(135deg,#fff3f8,#fffafb);border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:12px}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(50,35,42,.35);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
+.modal-backdrop.open{display:flex}.modal{width:min(760px,100%);max-height:88vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:24px 24px 18px 18px;padding:16px;box-shadow:0 20px 60px rgba(80,50,65,.2)}
+.recipe-summary{background:var(--soft);border-radius:14px;padding:10px 12px;margin-top:10px}
 </style>
 </head>
 <body>
 <div class="shell">
-<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small"><strong>V2.5</strong> · Daily goals, meals & progress</div></header>
+<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small"><strong>V2.6</strong> · Daily goals, meals & progress</div></header>
 
 <section id="diaryView" class="view active">
   <div class="card">
@@ -164,15 +168,19 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
       <div><label>Measurement unit</label><select id="foodUnitSelect" onchange="toggleCustomFoodUnit()"></select></div>
       <div id="customFoodUnitWrap" style="display:none"><label>Custom measurement unit</label><input id="customFoodUnit" placeholder="e.g. scoop, pouch, bottle"></div>
       <div><label>Nutrition basis amount</label><input id="foodBasisAmount" type="number" step="0.1" min="0" value="100"></div>
-      <div><label>Custom serving name (optional)</label><input id="foodServingName" placeholder="e.g. slice, wrap"></div>
-      <div><label>Serving size in chosen unit (optional)</label><input id="foodServingSize" type="number" step="0.1" min="0"></div>
+            <div><label>Default serving size in chosen unit (optional)</label><input id="foodServingSize" type="number" step="0.1" min="0"></div>
       <div><label id="energyLabel">Calories (kcal)</label><input id="foodEnergy" type="number" step="0.1" min="0"></div>
       <div><label>Protein (g)</label><input id="foodProtein" type="number" step="0.1" min="0"></div>
       <div><label>Carbs (g)</label><input id="foodCarbs" type="number" step="0.1" min="0"></div>
       <div><label>Fat (g)</label><input id="foodFat" type="number" step="0.1" min="0"></div>
       <div><label>Fibre (g)</label><input id="foodFibre" type="number" step="0.1" min="0"></div>
     </div>
-    <div style="margin-top:10px"><button onclick="saveFood()">Save food</button></div>
+    <input id="editingFoodId" type="hidden">
+<div id="foodEditStatus" class="small" style="display:none;margin-top:10px"></div>
+<div class="btn-row" style="margin-top:10px">
+<button id="saveFoodBtn" onclick="saveFood()">Save food</button>
+<button id="cancelFoodEditBtn" class="secondary" style="display:none" onclick="cancelFoodEdit()">Cancel edit</button>
+</div>
   </div>
   <div class="card">
     <h2>Saved foods</h2>
@@ -182,30 +190,22 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 </section>
 
 <section id="mealsView" class="view">
-  <div class="card">
-    <h2>Build a meal</h2>
-    <div><label>Meal name</label><input id="mealName" placeholder="e.g. Breakfast burrito"></div>
-    <div style="margin-top:10px"><label>Search ingredient</label><input id="mealSearch" placeholder="Search your saved foods..." oninput="renderMealSearch()">
-      <div id="mealSelected" class="selected-chip" style="display:none"></div>
-      <div id="mealSearchResults" class="search-results" style="display:none"></div>
-    </div>
-    <div class="grid grid-2" style="margin-top:10px">
-      <div><label>Amount type</label><select id="mealFoodMode" onchange="updateMealAmountLabel()"><option value="servings">Serving</option><option value="baseunit">Food unit</option></select></div>
-      <div><label id="mealAmountLabel">Amount</label><input id="mealFoodAmount" type="number" step="0.1" min="0" value="1"></div>
-    </div>
-    <div style="margin-top:10px"><button class="secondary" onclick="addMealIngredient()">Add ingredient</button></div>
-    <div style="margin-top:15px">
-      <div class="between"><h3>Ingredients</h3><span id="ingredientCount" class="small">0 ingredients</span></div>
-      <div id="mealBuilderList"></div>
-      <div id="mealBuilderTotals" class="small" style="margin-top:10px"></div>
-    </div>
-    <div style="margin-top:12px"><button onclick="saveMeal()">Save complete meal</button></div>
-  </div>
-  <div class="card">
-    <h2>Saved meals</h2>
-    <input id="mealSavedSearch" placeholder="Search saved meals..." oninput="renderMeals()">
-    <div id="mealsList"></div>
-  </div>
+<div class="card">
+<h2>Build a meal</h2>
+<div><label>Meal name</label><input id="mealName" placeholder="e.g. Breakfast burrito batch"></div>
+<div style="margin-top:10px"><label>How many servings does the whole meal make?</label><input id="mealServings" type="number" step="0.5" min="0.5" value="1" oninput="renderMealBuilder()"><div class="small" style="margin-top:5px">Ingredient amounts are for the whole batch. Per-serving macros update automatically.</div></div>
+<div style="margin-top:16px"><label>Search ingredient</label><input id="mealSearch" placeholder="Search your saved foods..." oninput="renderMealSearch()"><div id="mealSelected" class="selected-chip" style="display:none"></div><div id="mealSearchResults" class="search-results" style="display:none"></div></div>
+<div class="grid grid-2" style="margin-top:10px">
+<div><label>Amount unit</label><select id="mealFoodMode" onchange="updateMealAmountLabel()"><option value="baseunit">Food unit</option><option value="servings">Default serving</option></select></div>
+<div><label id="mealAmountLabel">Amount</label><input id="mealFoodAmount" type="number" step="0.1" min="0" value="1"></div>
+</div>
+<div style="margin-top:10px"><button class="secondary" onclick="addMealIngredient()">Add ingredient</button></div>
+<div style="margin-top:16px"><div class="between"><h3>Ingredients</h3><span id="ingredientCount" class="small">0 ingredients</span></div><div id="mealBuilderList"></div></div>
+<div id="mealBuilderTotals" class="recipe-summary"></div>
+<div id="mealEditStatus" class="small" style="display:none;margin-top:10px"></div>
+<div class="btn-row" style="margin-top:12px"><button id="saveMealBtn" onclick="saveMeal()">Save meal</button><button id="cancelMealEditBtn" class="secondary" style="display:none" onclick="cancelMealEdit()">Cancel edit</button></div>
+</div>
+<div class="card"><h2>Saved meals</h2><input id="mealSavedSearch" placeholder="Search saved meals..." oninput="renderMeals()"><div id="mealsList"></div></div>
 </section>
 
 <section id="settingsView" class="view">
@@ -230,7 +230,6 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
       <div><label>Daily goal amount</label><input id="waterGoalAmount" type="number" step="0.1" min="0"></div>
       <div id="waterCustomNameWrap" style="display:none"><label>Custom container name</label><input id="waterCustomName" placeholder="e.g. Stanley bottle"></div>
       <div id="waterCustomVolumeWrap" style="display:none"><label>Container volume in mL (optional)</label><input id="waterCustomVolumeMl" type="number" step="1" min="0" placeholder="e.g. 1200"></div>
-      <div><label>Logging step</label><select id="waterStep"><option value="0.25">Quarter</option><option value="0.5">Half</option><option value="1">Whole</option></select></div>
     </div>
     <div style="margin-top:10px"><button onclick="saveWaterGoal()">Save water goal</button></div>
   </div>
@@ -255,6 +254,12 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 <button class="tab" onclick="switchTab('meals',this)">Meals</button>
 <button class="tab" onclick="switchTab('settings',this)">Goals</button>
 </div></nav>
+<div id="mealModalBackdrop" class="modal-backdrop" onclick="closeMealModal(event)">
+<div class="modal" onclick="event.stopPropagation()">
+<div class="between"><div><h2 id="mealModalTitle">Saved meal</h2><div id="mealModalMeta" class="small"></div></div><button class="secondary" style="width:auto" onclick="closeMealModal()">Close</button></div>
+<div id="mealModalBody" style="margin-top:12px"></div>
+<div class="btn-row" style="margin-top:14px"><button onclick="editMealFromModal()">Edit meal</button><button class="danger" onclick="deleteMealFromModal()">Delete meal</button></div>
+</div></div>
 
 <script>
 const KCAL_TO_KJ=4.184;
@@ -270,7 +275,7 @@ let waterGoal=JSON.parse(localStorage.getItem('macroWaterGoal')||JSON.stringify(
 let customUnits=JSON.parse(localStorage.getItem('macroCustomUnits')||'[]');
 let displayEnergyMode=localStorage.getItem('macroEnergyMode')||'kcal';
 let entryEnergyMode='kcal';
-let selectedDate=new Date(),diarySelection=null,mealSelection=null,mealBuilder=[];
+let selectedDate=new Date(),diarySelection=null,mealSelection=null,mealBuilder=[],editingMealId=null,openMealId=null;
 
 const byId=id=>document.getElementById(id);
 const dateTitle=byId('dateTitle'),dateSubtitle=byId('dateSubtitle'),ringGrid=byId('ringGrid'),
@@ -280,20 +285,20 @@ diarySearch=byId('diarySearch'),diarySelected=byId('diarySelected'),diarySearchR
 diaryMealType=byId('diaryMealType'),diaryAmountMode=byId('diaryAmountMode'),diaryAmountLabel=byId('diaryAmountLabel'),
 diaryAmount=byId('diaryAmount'),diaryList=byId('diaryList'),foodName=byId('foodName'),
 foodUnitSelect=byId('foodUnitSelect'),customFoodUnitWrap=byId('customFoodUnitWrap'),customFoodUnit=byId('customFoodUnit'),
-foodBasisAmount=byId('foodBasisAmount'),foodServingName=byId('foodServingName'),foodServingSize=byId('foodServingSize'),
+foodBasisAmount=byId('foodBasisAmount'),foodServingSize=byId('foodServingSize'),
 foodEnergy=byId('foodEnergy'),foodProtein=byId('foodProtein'),foodCarbs=byId('foodCarbs'),foodFat=byId('foodFat'),
 foodFibre=byId('foodFibre'),foodSearch=byId('foodSearch'),foodsList=byId('foodsList'),
 energyKcalBtn=byId('energyKcalBtn'),energyKjBtn=byId('energyKjBtn'),energyLabel=byId('energyLabel'),
-mealName=byId('mealName'),mealSearch=byId('mealSearch'),mealSelected=byId('mealSelected'),
+mealName=byId('mealName'),mealServings=byId('mealServings'),mealSearch=byId('mealSearch'),mealSelected=byId('mealSelected'),
 mealSearchResults=byId('mealSearchResults'),mealFoodMode=byId('mealFoodMode'),mealAmountLabel=byId('mealAmountLabel'),
 mealFoodAmount=byId('mealFoodAmount'),ingredientCount=byId('ingredientCount'),mealBuilderList=byId('mealBuilderList'),
-mealBuilderTotals=byId('mealBuilderTotals'),mealSavedSearch=byId('mealSavedSearch'),mealsList=byId('mealsList'),
+mealBuilderTotals=byId('mealBuilderTotals'),mealSavedSearch=byId('mealSavedSearch'),mealsList=byId('mealsList'),editingFoodId=byId('editingFoodId'),foodEditStatus=byId('foodEditStatus'),saveFoodBtn=byId('saveFoodBtn'),cancelFoodEditBtn=byId('cancelFoodEditBtn'),mealEditStatus=byId('mealEditStatus'),saveMealBtn=byId('saveMealBtn'),cancelMealEditBtn=byId('cancelMealEditBtn'),mealModalBackdrop=byId('mealModalBackdrop'),mealModalTitle=byId('mealModalTitle'),mealModalMeta=byId('mealModalMeta'),mealModalBody=byId('mealModalBody'),
 targetEnergyLabel=byId('targetEnergyLabel'),targetCalories=byId('targetCalories'),targetProtein=byId('targetProtein'),
 targetCarbs=byId('targetCarbs'),targetFat=byId('targetFat'),targetFibre=byId('targetFibre'),
 settingsEnergyMode=byId('settingsEnergyMode'),waterGoalType=byId('waterGoalType'),waterVolumeUnitWrap=byId('waterVolumeUnitWrap'),
 waterVolumeUnit=byId('waterVolumeUnit'),waterGoalAmount=byId('waterGoalAmount'),waterCustomNameWrap=byId('waterCustomNameWrap'),
 waterCustomName=byId('waterCustomName'),waterCustomVolumeWrap=byId('waterCustomVolumeWrap'),waterCustomVolumeMl=byId('waterCustomVolumeMl'),
-waterStep=byId('waterStep'),newFoodUnit=byId('newFoodUnit'),customUnitList=byId('customUnitList'),
+newFoodUnit=byId('newFoodUnit'),customUnitList=byId('customUnitList'),
 waterHelp=byId('waterHelp'),waterLogAmount=byId('waterLogAmount'),waterLogUnit=byId('waterLogUnit');
 
 
@@ -308,21 +313,9 @@ function energyUnit(){return displayEnergyMode==='kj'?'kJ':'kcal'}
 function energyInputToKcal(v){return entryEnergyMode==='kj'?(Number(v)||0)/KCAL_TO_KJ:(Number(v)||0)}
 
 function migrateLegacyData(){
- foods=foods.map(f=>{
-   if(f.unit && f.basisAmount) return f;
-   const oldBasis=f.basis||'100g';
-   const inferredUnit='g';
-   const inferredBasisAmount=oldBasis==='100g'?100:(Number(f.servingGrams)||1);
-   return {
-     ...f,
-     unit:f.unit||inferredUnit,
-     basisAmount:Number(f.basisAmount)||inferredBasisAmount,
-     servingName:(f.servingName||'').trim(),
-     servingSize:Number(f.servingSize)||Number(f.servingGrams)||null
-   };
- });
- if(!waterGoal || typeof waterGoal!=='object') waterGoal={...DEFAULT_WATER};
- if(!waterGoal.type) waterGoal={...DEFAULT_WATER,...waterGoal};
+ foods=foods.map((f,i)=>({...f,id:f.id||`food_${Date.now()}_${i}_${Math.random().toString(36).slice(2,7)}`,unit:f.unit||'g',basisAmount:Number(f.basisAmount)||(f.basis==='100g'?100:(Number(f.servingGrams)||1)),servingSize:Number(f.servingSize)||Number(f.servingGrams)||null}));
+ meals=meals.map((m,i)=>{const bs=Number(m.batchServings)||1;const bm=m.batchMacros||scale(m.macros||zero(),bs);return {...m,id:m.id||`meal_${Date.now()}_${i}_${Math.random().toString(36).slice(2,7)}`,batchServings:bs,batchMacros:bm,macros:scale(bm,1/bs),ingredients:(m.ingredients||[]).map((x,j)=>({...x,id:x.id||`ing_${i}_${j}_${Math.random().toString(36).slice(2,7)}`,foodId:x.foodId||(foods[x.foodIndex]?.id||null)}))}});
+ if(!waterGoal||typeof waterGoal!=='object')waterGoal={...DEFAULT_WATER};delete waterGoal.step;
 }
 migrateLegacyData();
 
@@ -332,11 +325,10 @@ function saveAll(){
  localStorage.setItem('macroTargets',JSON.stringify(targets));localStorage.setItem('macroWaterGoal',JSON.stringify(waterGoal));
  localStorage.setItem('macroCustomUnits',JSON.stringify(customUnits));localStorage.setItem('macroEnergyMode',displayEnergyMode)
 }
-function servingLabel(f){return f.servingName?.trim()||''}
 function foodMacros(f,a,mode){
  a=Number(a)||0;
- if(mode==='baseunit') return scale(f,a/(Number(f.basisAmount)||1));
- if(servingLabel(f) && Number(f.servingSize)>0) return scale(f,(a*Number(f.servingSize))/(Number(f.basisAmount)||1));
+ if(mode==='baseunit')return scale(f,a/(Number(f.basisAmount)||1));
+ if(Number(f.servingSize)>0)return scale(f,(a*Number(f.servingSize))/(Number(f.basisAmount)||1));
  return scale(f,a);
 }
 function switchTab(name,b){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.tab').forEach(v=>v.classList.remove('active'));document.getElementById(name+'View').classList.add('active');b.classList.add('active')}
@@ -403,7 +395,7 @@ function renderRings(t){
  const wh=document.getElementById('waterHelp');
  if(wh){
    wh.textContent=waterGoal.type==='custom'
-     ? `Goal: ${waterGoal.amount} ${waterGoal.customName||'container'}${waterGoal.amount===1?'':'s'} · log in ${waterGoal.step} increments`
+     ? `Goal: ${waterGoal.amount} ${waterGoal.customName||'container'}${waterGoal.amount===1?'':'s'}`
      : `Goal: ${waterGoal.amount} ${waterGoal.unit}`;
  }
  renderWaterLogUnits();
@@ -429,20 +421,37 @@ function changeDisplayEnergyMode(mode){displayEnergyMode=mode;saveAll();loadTarg
 function saveFood(){
  const name=foodName.value.trim();if(!name)return alert('Enter a food name.');
  const unit=foodUnitSelect.value==='__custom__'?customFoodUnit.value.trim():foodUnitSelect.value;if(!unit)return alert('Choose or enter a measurement unit.');
- foods.push({name,unit,basisAmount:+foodBasisAmount.value||1,servingName:foodServingName.value.trim(),servingSize:+foodServingSize.value||null,calories:energyInputToKcal(foodEnergy.value),protein:+foodProtein.value||0,carbs:+foodCarbs.value||0,fat:+foodFat.value||0,fibre:+foodFibre.value||0});
- ['foodName','customFoodUnit','foodServingName','foodServingSize','foodEnergy','foodProtein','foodCarbs','foodFat','foodFibre'].forEach(id=>document.getElementById(id).value='');foodBasisAmount.value=100;saveAll();renderFoods()
+ const rec={id:editingFoodId.value||`food_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,name,unit,basisAmount:+foodBasisAmount.value||1,servingSize:+foodServingSize.value||null,calories:energyInputToKcal(foodEnergy.value),protein:+foodProtein.value||0,carbs:+foodCarbs.value||0,fat:+foodFat.value||0,fibre:+foodFibre.value||0};
+ if(editingFoodId.value){const i=foods.findIndex(f=>f.id===editingFoodId.value);if(i>=0)foods[i]=rec}else foods.push(rec);
+ saveAll();cancelFoodEdit();renderFoods();renderMeals();
 }
+function editFood(id){
+ const f=foods.find(x=>x.id===id);if(!f)return;editingFoodId.value=f.id;foodName.value=f.name;foodBasisAmount.value=f.basisAmount||1;foodServingSize.value=f.servingSize||'';foodEnergy.value=entryEnergyMode==='kj'?fmt((f.calories||0)*KCAL_TO_KJ):fmt(f.calories||0);foodProtein.value=f.protein||0;foodCarbs.value=f.carbs||0;foodFat.value=f.fat||0;foodFibre.value=f.fibre||0;renderFoodUnits();
+ if([...DEFAULT_UNITS,...customUnits].includes(f.unit)){foodUnitSelect.value=f.unit;customFoodUnitWrap.style.display='none'}else{foodUnitSelect.value='__custom__';customFoodUnit.value=f.unit||'';customFoodUnitWrap.style.display='block'}
+ foodEditStatus.style.display='block';foodEditStatus.textContent=`Editing ${f.name}`;saveFoodBtn.textContent='Update food';cancelFoodEditBtn.style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelFoodEdit(){editingFoodId.value='';foodEditStatus.style.display='none';saveFoodBtn.textContent='Save food';cancelFoodEditBtn.style.display='none';['foodName','customFoodUnit','foodServingSize','foodEnergy','foodProtein','foodCarbs','foodFat','foodFibre'].forEach(id=>{const e=byId(id);if(e)e.value=''});foodBasisAmount.value=100}
 function renderFoods(){const q=foodSearch.value.trim().toLowerCase();const items=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q));foodsList.innerHTML=items.length?items.map(({f,i})=>`<div class="item"><div><div class="item-title">${esc(f.name)}</div><div class="item-sub">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P · ${fmt(f.carbs)}g C · ${fmt(f.fat)}g F · ${fmt(f.fibre)}g fibre<br>per ${fmt(f.basisAmount)} ${esc(f.unit)}${servingLabel(f)?` · ${esc(servingLabel(f))}${f.servingSize?` = ${fmt(f.servingSize)} ${esc(f.unit)}`:''}`:''}</div></div><div class="item-actions"><button class="danger" onclick="deleteFood(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved foods found.</div>'}
 function deleteFood(i){if(confirm('Delete this food?')){foods.splice(i,1);saveAll();renderFoods()}}
 function renderMealSearch(){const q=mealSearch.value.trim().toLowerCase();if(!q){mealSearchResults.style.display='none';return}const arr=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q)).slice(0,20);mealSearchResults.innerHTML=arr.map(({f,i})=>`<div class="search-option" onclick="selectMealFood(${i})"><strong>${esc(f.name)}</strong><span class="small">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P</span></div>`).join('')||'<div class="empty">No matches</div>';mealSearchResults.style.display='block'}
 function selectMealFood(i){mealSelection=i;const f=foods[i];mealSelected.style.display='block';mealSelected.innerHTML=`<strong>${esc(f.name)}</strong><div class="small">${fmt(f.basisAmount)} ${esc(f.unit)} nutrition basis</div>`;mealSearchResults.style.display='none';mealSearch.value='';updateMealAmountLabel()}
 function updateMealAmountLabel(){if(mealSelection==null)return;const f=foods[mealSelection];mealAmountLabel.textContent=mealFoodMode.value==='baseunit'?`Amount (${f.unit})`:(servingLabel(f)?`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`:'Number of servings')}
-function addMealIngredient(){if(mealSelection==null)return alert('Choose an ingredient.');const f=foods[mealSelection],amount=+mealFoodAmount.value||0,mode=mealFoodMode.value,macros=foodMacros(f,amount,mode);mealBuilder.push({foodIndex:mealSelection,name:f.name,amount,mode,macros});renderMealBuilder()}
-function renderMealBuilder(){ingredientCount.textContent=`${mealBuilder.length} ingredient${mealBuilder.length===1?'':'s'}`;let total=zero();mealBuilder.forEach(x=>total=plus(total,x.macros));mealBuilderList.innerHTML=mealBuilder.length?mealBuilder.map((x,i)=>{const f=foods[x.foodIndex]||{};const amtText=x.mode==='baseunit'?`${fmt(x.amount)} ${esc(f.unit||'unit')}`:(servingLabel(f)?`${fmt(x.amount)} ${esc(servingLabel(f))}`:`${fmt(x.amount)} serving${x.amount===1?'':'s'}`);return `<div class="ingredient-card"><div class="ingredient-top"><div><strong>${esc(x.name)}</strong><div class="small">${amtText}</div></div><button class="danger" style="width:auto;padding:7px 9px" onclick="removeIngredient(${i})">Remove</button></div><div class="ingredient-macros">${energyDisplay(x.macros.calories)} ${energyUnit()} · ${fmt(x.macros.protein)}g protein · ${fmt(x.macros.carbs)}g carbs · ${fmt(x.macros.fat)}g fat · ${fmt(x.macros.fibre)}g fibre</div></div>`}).join(''):'<div class="empty">Add as many ingredients as you like.</div>';mealBuilderTotals.innerHTML=`<strong>Meal total:</strong> ${energyDisplay(total.calories)} ${energyUnit()} · ${fmt(total.protein)}g protein · ${fmt(total.carbs)}g carbs · ${fmt(total.fat)}g fat · ${fmt(total.fibre)}g fibre`}
-function removeIngredient(i){mealBuilder.splice(i,1);renderMealBuilder()}
-function saveMeal(){const name=mealName.value.trim();if(!name)return alert('Enter a meal name.');if(!mealBuilder.length)return alert('Add at least one ingredient.');let total=zero();mealBuilder.forEach(x=>total=plus(total,x.macros));meals.push({name,ingredients:mealBuilder.map(x=>({...x})),macros:total});mealBuilder=[];mealName.value='';saveAll();renderMealBuilder();renderMeals()}
-function renderMeals(){const q=mealSavedSearch.value.trim().toLowerCase();const arr=meals.map((m,i)=>({m,i})).filter(x=>x.m.name.toLowerCase().includes(q));mealsList.innerHTML=arr.length?arr.map(({m,i})=>`<div class="item"><div><div class="item-title">${esc(m.name)}</div><div class="item-sub">${energyDisplay(m.macros.calories)} ${energyUnit()} · ${fmt(m.macros.protein)}g P · ${fmt(m.macros.carbs)}g C · ${fmt(m.macros.fat)}g F · ${fmt(m.macros.fibre)}g fibre</div></div><div class="item-actions"><button class="danger" onclick="deleteMeal(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved meals found.</div>'}
-function deleteMeal(i){if(confirm('Delete this meal?')){meals.splice(i,1);saveAll();renderMeals()}}
+function addMealIngredient(){if(!mealSelection)return alert('Choose an ingredient.');const f=foods.find(x=>x.id===mealSelection);if(!f)return;const amount=+mealFoodAmount.value||0,mode=mealFoodMode.value;if(amount<=0)return alert('Enter an amount greater than 0.');mealBuilder.push({id:`ing_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,foodId:f.id,name:f.name,amount,mode,unit:f.unit,servingSize:f.servingSize||null,macros:foodMacros(f,amount,mode)});renderMealBuilder()}
+function ingredientFood(x){return foods.find(f=>f.id===x.foodId)||null}
+function recalcIngredient(x){const f=ingredientFood(x);if(f){x.name=f.name;x.unit=f.unit;x.servingSize=f.servingSize||null;x.macros=foodMacros(f,x.amount,x.mode)}return x}
+function changeIngredientAmount(id,v){const x=mealBuilder.find(i=>i.id===id);if(!x)return;x.amount=Math.max(0,Number(v)||0);recalcIngredient(x);renderMealBuilder()}
+function changeIngredientMode(id,m){const x=mealBuilder.find(i=>i.id===id);if(!x)return;x.mode=m;recalcIngredient(x);renderMealBuilder()}
+function renderMealBuilder(){const servings=Math.max(.5,Number(mealServings.value)||1);ingredientCount.textContent=`${mealBuilder.length} ingredient${mealBuilder.length===1?'':'s'}`;let batch=zero();mealBuilder.forEach(x=>{recalcIngredient(x);batch=plus(batch,x.macros)});const per=scale(batch,1/servings);mealBuilderList.innerHTML=mealBuilder.length?mealBuilder.map(x=>{const f=ingredientFood(x),u=f?.unit||x.unit||'unit',ds=f?.servingSize||x.servingSize;return `<div class="ingredient-card"><div class="ingredient-top"><div><strong>${esc(x.name)}</strong><div class="small">${energyDisplay(x.macros.calories)} ${energyUnit()} · ${fmt(x.macros.protein)}g P · ${fmt(x.macros.carbs)}g C · ${fmt(x.macros.fat)}g F · ${fmt(x.macros.fibre)}g fibre</div></div><button class="danger" style="width:auto;padding:7px 9px" onclick="removeIngredient('${x.id}')">Remove</button></div><div class="grid grid-2" style="margin-top:9px"><div><label>Amount</label><input type="number" step="0.1" min="0" value="${fmt(x.amount)}" onchange="changeIngredientAmount('${x.id}',this.value)"></div><div><label>Unit</label><select onchange="changeIngredientMode('${x.id}',this.value)"><option value="baseunit" ${x.mode==='baseunit'?'selected':''}>${esc(u)}</option><option value="servings" ${x.mode==='servings'?'selected':''}>Default serving${ds?` (${fmt(ds)} ${esc(u)})`:''}</option></select></div></div></div>`}).join(''):'<div class="empty">Add ingredients for the full batch.</div>';mealBuilderTotals.innerHTML=`<div><strong>Whole batch:</strong> ${energyDisplay(batch.calories)} ${energyUnit()} · ${fmt(batch.protein)}g protein · ${fmt(batch.carbs)}g carbs · ${fmt(batch.fat)}g fat · ${fmt(batch.fibre)}g fibre</div><div style="margin-top:6px"><strong>Per serving (${fmt(servings)} total):</strong> ${energyDisplay(per.calories)} ${energyUnit()} · ${fmt(per.protein)}g protein · ${fmt(per.carbs)}g carbs · ${fmt(per.fat)}g fat · ${fmt(per.fibre)}g fibre</div>`}
+function removeIngredient(id){mealBuilder=mealBuilder.filter(x=>x.id!==id);renderMealBuilder()}
+function saveMeal(){const name=mealName.value.trim();if(!name)return alert('Enter a meal name.');if(!mealBuilder.length)return alert('Add at least one ingredient.');const bs=Math.max(.5,Number(mealServings.value)||1);let bm=zero();mealBuilder.forEach(x=>{recalcIngredient(x);bm=plus(bm,x.macros)});const rec={id:editingMealId||`meal_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,name,batchServings:bs,batchMacros:bm,macros:scale(bm,1/bs),ingredients:mealBuilder.map(x=>({...x}))};if(editingMealId){const i=meals.findIndex(m=>m.id===editingMealId);if(i>=0)meals[i]=rec}else meals.push(rec);saveAll();cancelMealEdit();renderMeals()}
+function startEditMeal(id){const m=meals.find(x=>x.id===id);if(!m)return;editingMealId=m.id;mealName.value=m.name;mealServings.value=m.batchServings||1;mealBuilder=(m.ingredients||[]).map(x=>({...x,id:x.id||`ing_${Date.now()}_${Math.random()}`}));mealEditStatus.style.display='block';mealEditStatus.textContent=`Editing ${m.name}`;saveMealBtn.textContent='Update meal';cancelMealEditBtn.style.display='block';renderMealBuilder();switchTab('meals',document.querySelectorAll('.tab')[2]);window.scrollTo({top:0,behavior:'smooth'})}
+function cancelMealEdit(){editingMealId=null;mealName.value='';mealServings.value=1;mealBuilder=[];mealSelection=null;mealSelected.style.display='none';mealEditStatus.style.display='none';saveMealBtn.textContent='Save meal';cancelMealEditBtn.style.display='none';renderMealBuilder()}
+function openMeal(id){const m=meals.find(x=>x.id===id);if(!m)return;openMealId=id;mealModalTitle.textContent=m.name;mealModalMeta.textContent=`${fmt(m.batchServings||1)} servings · ${energyDisplay(m.macros.calories)} ${energyUnit()} per serving`;mealModalBody.innerHTML=`<div class="recipe-summary"><strong>Per serving:</strong> ${energyDisplay(m.macros.calories)} ${energyUnit()} · ${fmt(m.macros.protein)}g protein · ${fmt(m.macros.carbs)}g carbs · ${fmt(m.macros.fat)}g fat · ${fmt(m.macros.fibre)}g fibre</div><div class="recipe-summary"><strong>Whole batch:</strong> ${energyDisplay(m.batchMacros.calories)} ${energyUnit()} · ${fmt(m.batchMacros.protein)}g protein · ${fmt(m.batchMacros.carbs)}g carbs · ${fmt(m.batchMacros.fat)}g fat · ${fmt(m.batchMacros.fibre)}g fibre</div><div style="margin-top:12px"><strong>Ingredients for full batch</strong></div>${(m.ingredients||[]).map(x=>{const f=ingredientFood(x),amt=x.mode==='baseunit'?`${fmt(x.amount)} ${esc(f?.unit||x.unit||'unit')}`:`${fmt(x.amount)} default serving${x.amount===1?'':'s'}`;return `<div class="ingredient-card"><strong>${esc(x.name)}</strong><div class="small">${amt}</div></div>`}).join('')}`;mealModalBackdrop.classList.add('open')}
+function closeMealModal(){mealModalBackdrop.classList.remove('open')}
+function editMealFromModal(){const id=openMealId;closeMealModal();startEditMeal(id)}
+function deleteMealFromModal(){const id=openMealId;closeMealModal();deleteMeal(id)}
+function deleteMeal(id){if(confirm('Delete this saved meal?')){meals=meals.filter(m=>m.id!==id);saveAll();renderMeals()}}
+function renderMeals(){const q=mealSavedSearch.value.trim().toLowerCase(),arr=meals.filter(m=>m.name.toLowerCase().includes(q));mealsList.innerHTML=arr.length?arr.map(m=>`<div class="item"><div onclick="openMeal('${m.id}')" style="cursor:pointer;flex:1"><div class="item-title">${esc(m.name)}</div><div class="item-sub">${fmt(m.batchServings||1)} servings · per serving: ${energyDisplay(m.macros.calories)} ${energyUnit()} · ${fmt(m.macros.protein)}g P · ${fmt(m.macros.fibre)}g fibre</div></div><div class="item-actions"><button class="secondary" onclick="openMeal('${m.id}')">View</button><button class="secondary" onclick="startEditMeal('${m.id}')">Edit</button></div></div>`).join(''):'<div class="empty">No saved meals found.</div>'}
 function loadTargets(){settingsEnergyMode.value=displayEnergyMode;targetEnergyLabel.textContent=displayEnergyMode==='kj'?'Energy goal (kJ)':'Calories goal (kcal)';targetCalories.value=displayEnergyMode==='kj'?fmt(targets.calories*KCAL_TO_KJ):targets.calories;targetProtein.value=targets.protein;targetCarbs.value=targets.carbs;targetFat.value=targets.fat;targetFibre.value=targets.fibre;fillQuickGoals()}
 function saveTargets(){targets={calories:displayEnergyMode==='kj'?(+targetCalories.value||0)/KCAL_TO_KJ:(+targetCalories.value||1550),protein:+targetProtein.value||110,carbs:+targetCarbs.value||165,fat:+targetFat.value||50,fibre:+targetFibre.value||30};saveAll();fillQuickGoals();renderDiary();alert('Macro goals saved.')}
 function renderFoodUnits(){foodUnitSelect.innerHTML=[...DEFAULT_UNITS,...customUnits].map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join('')+`<option value="__custom__">+ Custom unit</option>`;renderCustomUnitList()}
