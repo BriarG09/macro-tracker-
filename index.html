@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#f7f6f3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Macro Tracker">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Macro Tracker</title>
+<style>
+:root{
+  --bg:#f5f4f1;--card:#fff;--text:#1f1f20;--muted:#77736d;--line:#e8e4dd;
+  --soft:#f0eee9;--accent:#222;--good:#637b68;--danger:#9a4f4a;--shadow:0 8px 26px rgba(30,25,20,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.shell{max-width:820px;margin:0 auto;padding:18px 14px 100px}
+h1{font-size:29px;letter-spacing:-.7px;margin:0} h2{font-size:17px;margin:0 0 12px} h3{font-size:14px;margin:0}
+.small{font-size:12px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:10px}.row{display:flex;gap:8px;align-items:center}
+button{border:0;border-radius:13px;padding:11px 13px;background:var(--accent);color:#fff;font:inherit;font-weight:750;cursor:pointer}
+button.secondary{background:var(--soft);color:var(--text)} button.danger{background:#f7e9e7;color:var(--danger)}
+input,select{width:100%;border:1px solid var(--line);border-radius:13px;padding:11px 12px;background:#fff;color:var(--text);font:inherit;outline:none}
+input:focus,select:focus{border-color:#b9b3aa}
+label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0 5px}
+.grid{display:grid;gap:10px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:620px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);backdrop-filter:blur(12px);z-index:20}
+.tabs-inner{max-width:820px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.tab{background:transparent;color:var(--muted);border-radius:0;padding:13px 6px;font-size:12px}.tab.active{color:var(--text);font-weight:800}
+.view{display:none}.view.active{display:block}
+.date-nav button{width:auto;padding:9px 12px;background:var(--soft);color:var(--text)}
+.ring-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:start}
+@media(max-width:720px){.ring-grid{grid-template-columns:repeat(3,1fr)}} @media(max-width:460px){.ring-grid{grid-template-columns:repeat(2,1fr)}}
+.ring-card{background:#faf9f7;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center}
+.ring{--p:0;--ring:#657a69;width:104px;height:104px;margin:0 auto 8px;border-radius:50%;
+ background:conic-gradient(var(--ring) calc(var(--p)*1%), #e9e6e0 0);
+ display:grid;place-items:center;position:relative}
+.ring:before{content:"";width:78px;height:78px;border-radius:50%;background:#faf9f7;position:absolute}
+.ring-inner{position:relative;z-index:1;line-height:1.05}.ring-inner strong{font-size:20px;display:block}.ring-inner span{font-size:10px;color:var(--muted)}
+.ring-card .name{font-weight:750;font-size:13px}.ring-card .goal{font-size:11px;color:var(--muted);margin-top:2px}
+.quick-edit{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.item{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}
+.item-title{font-weight:750}.item-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45}.item-actions{display:flex;gap:6px;align-items:center}.item-actions button{width:auto;padding:8px 10px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:18px 6px}.meal-block{margin-top:15px}.meal-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.search-results{margin-top:8px;border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#fff;max-height:260px;overflow-y:auto}
+.search-option{padding:11px 12px;border-bottom:1px solid var(--line);cursor:pointer}.search-option:last-child{border-bottom:0}.search-option strong{display:block;font-size:14px}
+.selected-chip{background:var(--soft);border-radius:14px;padding:10px 12px;margin-top:8px}
+.ingredient-card{border:1px solid var(--line);border-radius:16px;padding:11px;margin-top:8px;background:#faf9f7}
+.ingredient-top{display:flex;justify-content:space-between;gap:10px}.ingredient-macros{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.45}
+.pill{display:inline-block;background:var(--soft);border-radius:999px;padding:5px 8px;font-size:11px;margin:5px 4px 0 0}
+.weekly{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}@media(max-width:520px){.weekly{grid-template-columns:1fr}}
+.stat{border:1px solid var(--line);border-radius:16px;padding:12px;background:#faf9f7}.stat strong{font-size:18px;display:block}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}.btn-row button{flex:1;min-width:120px}
+</style>
+</head>
+<body>
+<div class="shell">
+<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small">Daily goals, meals & progress</div></header>
+
+<section id="diaryView" class="view active">
+  <div class="card">
+    <div class="between date-nav">
+      <button onclick="changeDate(-1)">‹</button>
+      <div style="text-align:center"><div id="dateTitle" style="font-weight:800"></div><div id="dateSubtitle" class="small"></div></div>
+      <button onclick="changeDate(1)">›</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="between"><h2>Daily progress</h2><button class="secondary" style="width:auto" onclick="toggleQuickGoals()">Edit goals</button></div>
+    <div id="ringGrid" class="ring-grid"></div>
+    <div id="quickGoals" class="quick-edit" style="display:none">
+      <div class="grid grid-3">
+        <div><label>Calories</label><input id="qCalories" type="number"></div>
+        <div><label>Protein (g)</label><input id="qProtein" type="number"></div>
+        <div><label>Carbs (g)</label><input id="qCarbs" type="number"></div>
+        <div><label>Fat (g)</label><input id="qFat" type="number"></div>
+        <div><label>Fibre (g)</label><input id="qFibre" type="number"></div>
+      </div>
+      <div style="margin-top:10px"><button onclick="saveQuickGoals()">Save goals</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="between"><h2>Weekly averages</h2><span class="small">Last 7 days</span></div>
+    <div id="weeklyStats" class="weekly"></div>
+  </div>
+
+  <div class="card">
+    <h2>Add to diary</h2>
+    <label>Search saved food or meal</label>
+    <input id="diarySearch" placeholder="Start typing..." oninput="renderDiarySearch()">
+    <div id="diarySelected" class="selected-chip" style="display:none"></div>
+    <div id="diarySearchResults" class="search-results" style="display:none"></div>
+    <div class="grid grid-2" style="margin-top:10px">
+      <div><label>Meal</label><select id="diaryMealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+      <div><label>Amount type</label><select id="diaryAmountMode" onchange="updateDiaryAmountLabel()"><option value="servings">Serving</option><option value="grams">Grams</option></select></div>
+      <div><label id="diaryAmountLabel">Amount</label><input id="diaryAmount" type="number" step="0.1" min="0" value="1"></div>
+    </div>
+    <div style="margin-top:10px"><button onclick="addDiaryEntry()">Add to diary</button></div>
+  </div>
+
+  <div class="card">
+    <div class="between"><h2>Diary</h2><button class="secondary" style="width:auto" onclick="copyPreviousDay()">Copy previous day</button></div>
+    <div id="diaryList"></div>
+  </div>
+</section>
+
+<section id="foodsView" class="view">
+  <div class="card">
+    <h2>Save a food</h2>
+    <div class="grid grid-2">
+      <div><label>Name</label><input id="foodName" placeholder="e.g. Edam cheese"></div>
+      <div><label>Nutrition basis</label><select id="foodBasis"><option value="100g">Per 100 g</option><option value="serving">Per serving</option></select></div>
+      <div><label>Custom serving name</label><input id="foodServingName" placeholder="e.g. slice, wrap, scoop"></div>
+      <div><label>Serving size in grams (optional)</label><input id="foodServingGrams" type="number" step="0.1" min="0"></div>
+      <div><label>Calories</label><input id="foodCalories" type="number" step="0.1" min="0"></div>
+      <div><label>Protein (g)</label><input id="foodProtein" type="number" step="0.1" min="0"></div>
+      <div><label>Carbs (g)</label><input id="foodCarbs" type="number" step="0.1" min="0"></div>
+      <div><label>Fat (g)</label><input id="foodFat" type="number" step="0.1" min="0"></div>
+      <div><label>Fibre (g)</label><input id="foodFibre" type="number" step="0.1" min="0"></div>
+    </div>
+    <div style="margin-top:10px"><button onclick="saveFood()">Save food</button></div>
+  </div>
+  <div class="card">
+    <h2>Saved foods</h2>
+    <input id="foodSearch" placeholder="Search saved foods..." oninput="renderFoods()">
+    <div id="foodsList"></div>
+  </div>
+</section>
+
+<section id="mealsView" class="view">
+  <div class="card">
+    <h2>Build a meal</h2>
+    <div><label>Meal name</label><input id="mealName" placeholder="e.g. Breakfast burrito"></div>
+    <div style="margin-top:10px"><label>Search ingredient</label><input id="mealSearch" placeholder="Search your saved foods..." oninput="renderMealSearch()">
+      <div id="mealSelected" class="selected-chip" style="display:none"></div>
+      <div id="mealSearchResults" class="search-results" style="display:none"></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:10px">
+      <div><label>Amount type</label><select id="mealFoodMode" onchange="updateMealAmountLabel()"><option value="servings">Serving</option><option value="grams">Grams</option></select></div>
+      <div><label id="mealAmountLabel">Amount</label><input id="mealFoodAmount" type="number" step="0.1" min="0" value="1"></div>
+    </div>
+    <div style="margin-top:10px"><button class="secondary" onclick="addMealIngredient()">Add ingredient</button></div>
+
+    <div style="margin-top:15px">
+      <div class="between"><h3>Ingredients</h3><span id="ingredientCount" class="small">0 ingredients</span></div>
+      <div id="mealBuilderList"></div>
+      <div id="mealBuilderTotals" class="small" style="margin-top:10px"></div>
+    </div>
+    <div style="margin-top:12px"><button onclick="saveMeal()">Save complete meal</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Saved meals</h2>
+    <input id="mealSavedSearch" placeholder="Search saved meals..." oninput="renderMeals()">
+    <div id="mealsList"></div>
+  </div>
+</section>
+
+<section id="settingsView" class="view">
+  <div class="card">
+    <h2>Macro goals</h2>
+    <div class="grid grid-2">
+      <div><label>Calories</label><input id="targetCalories" type="number"></div>
+      <div><label>Protein (g)</label><input id="targetProtein" type="number"></div>
+      <div><label>Carbs (g)</label><input id="targetCarbs" type="number"></div>
+      <div><label>Fat (g)</label><input id="targetFat" type="number"></div>
+      <div><label>Fibre (g)</label><input id="targetFibre" type="number"></div>
+    </div>
+    <div style="margin-top:10px"><button onclick="saveTargets()">Save goals</button></div>
+  </div>
+  <div class="card">
+    <h2>Data</h2>
+    <p class="small">Saved locally on this device/browser.</p>
+    <div class="btn-row"><button class="secondary" onclick="exportData()">Export backup</button><button class="danger" onclick="resetAll()">Reset all</button></div>
+  </div>
+</section>
+</div>
+
+<nav class="tabs"><div class="tabs-inner">
+<button class="tab active" onclick="switchTab('diary',this)">Today</button>
+<button class="tab" onclick="switchTab('foods',this)">Foods</button>
+<button class="tab" onclick="switchTab('meals',this)">Meals</button>
+<button class="tab" onclick="switchTab('settings',this)">Goals</button>
+</div></nav>
+
+<script>
+const DEFAULT_TARGETS={calories:1550,protein:110,carbs:165,fat:50,fibre:30};
+let foods=JSON.parse(localStorage.getItem('macroFoods')||'[]');
+let meals=JSON.parse(localStorage.getItem('macroMeals')||'[]');
+let diary=JSON.parse(localStorage.getItem('macroDiary')||'{}');
+let targets=JSON.parse(localStorage.getItem('macroTargets')||JSON.stringify(DEFAULT_TARGETS));
+let selectedDate=new Date(),diarySelection=null,mealSelection=null,mealBuilder=[];
+
+function keyFromDate(d){const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
+function fmt(n){return Math.round((Number(n)||0)*10)/10}
+function zero(){return{calories:0,protein:0,carbs:0,fat:0,fibre:0}}
+function plus(a,b){return{calories:a.calories+b.calories,protein:a.protein+b.protein,carbs:a.carbs+b.carbs,fat:a.fat+b.fat,fibre:a.fibre+b.fibre}}
+function scale(m,f){return{calories:m.calories*f,protein:m.protein*f,carbs:m.carbs*f,fat:m.fat*f,fibre:m.fibre*f}}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function saveAll(){localStorage.setItem('macroFoods',JSON.stringify(foods));localStorage.setItem('macroMeals',JSON.stringify(meals));localStorage.setItem('macroDiary',JSON.stringify(diary));localStorage.setItem('macroTargets',JSON.stringify(targets))}
+function servingLabel(f){return f.servingName?.trim()||'serving'}
+function foodMacros(f,a,mode){a=Number(a)||0;if(mode==='grams'){if(f.basis==='100g')return scale(f,a/100);if(Number(f.servingGrams)>0)return scale(f,a/Number(f.servingGrams));return zero()}return scale(f,a)}
+function switchTab(name,b){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.tab').forEach(v=>v.classList.remove('active'));document.getElementById(name+'View').classList.add('active');b.classList.add('active')}
+function changeDate(n){selectedDate.setDate(selectedDate.getDate()+n);renderDiary()}
+function renderDate(){const today=keyFromDate(selectedDate)===keyFromDate(new Date());dateTitle.textContent=selectedDate.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});dateSubtitle.textContent=today?'Today':selectedDate.getFullYear()}
+function totalsFor(k){let t=zero();(diary[k]||[]).forEach(e=>t=plus(t,e.macros));return t}
+function renderRings(t){
+ const data=[['Calories','calories','kcal'],['Protein','protein','g'],['Carbs','carbs','g'],['Fat','fat','g'],['Fibre','fibre','g']];
+ ringGrid.innerHTML=data.map(([name,k,u])=>{const p=Math.min(100,t[k]/targets[k]*100||0);return `<div class="ring-card"><div class="ring" style="--p:${p}"><div class="ring-inner"><strong>${fmt(t[k])}</strong><span>${u}</span></div></div><div class="name">${name}</div><div class="goal">${fmt(targets[k])}${u} goal</div></div>`}).join('');
+}
+function renderWeekly(){let sum=zero();for(let i=0;i<7;i++){const d=new Date(selectedDate);d.setDate(d.getDate()-i);sum=plus(sum,totalsFor(keyFromDate(d)))}const a=scale(sum,1/7);weeklyStats.innerHTML=`<div class="stat"><span class="small">Calories</span><strong>${fmt(a.calories)}</strong><span class="small">kcal/day</span></div><div class="stat"><span class="small">Protein</span><strong>${fmt(a.protein)} g</strong><span class="small">per day</span></div><div class="stat"><span class="small">Fibre</span><strong>${fmt(a.fibre)} g</strong><span class="small">per day</span></div>`}
+function renderDiary(){renderDate();const k=keyFromDate(selectedDate),entries=diary[k]||[];let total=zero();entries.forEach(e=>total=plus(total,e.macros));renderRings(total);renderWeekly();const groups=['Breakfast','Lunch','Dinner','Snack'];if(!entries.length){diaryList.innerHTML='<div class="empty">Nothing logged for this day.</div>';return}diaryList.innerHTML=groups.map(g=>{const es=entries.filter(e=>e.mealType===g);if(!es.length)return'';let gt=zero();es.forEach(e=>gt=plus(gt,e.macros));return `<div class="meal-block"><div class="meal-head"><h3>${g}</h3><span class="small">${fmt(gt.calories)} kcal · ${fmt(gt.protein)}g P · ${fmt(gt.fibre)}g fibre</span></div>${es.map(e=>`<div class="item"><div><div class="item-title">${esc(e.name)}</div><div class="item-sub">${fmt(e.macros.calories)} kcal · ${fmt(e.macros.protein)}g P · ${fmt(e.macros.carbs)}g C · ${fmt(e.macros.fat)}g F · ${fmt(e.macros.fibre)}g fibre</div></div><div class="item-actions"><button class="danger" onclick="deleteDiaryEntry('${e.id}')">Delete</button></div></div>`).join('')}</div>`}).join('')}
+function toggleQuickGoals(){quickGoals.style.display=quickGoals.style.display==='none'?'block':'none';fillQuickGoals()}
+function fillQuickGoals(){qCalories.value=targets.calories;qProtein.value=targets.protein;qCarbs.value=targets.carbs;qFat.value=targets.fat;qFibre.value=targets.fibre}
+function saveQuickGoals(){targets={calories:+qCalories.value||1550,protein:+qProtein.value||110,carbs:+qCarbs.value||165,fat:+qFat.value||50,fibre:+qFibre.value||30};saveAll();loadTargets();renderDiary();quickGoals.style.display='none'}
+function renderDiarySearch(){const q=diarySearch.value.trim().toLowerCase();if(!q){diarySearchResults.style.display='none';return}let o=[];foods.forEach((f,i)=>{if(f.name.toLowerCase().includes(q))o.push({type:'food',i,name:f.name,sub:`${fmt(f.calories)} kcal · ${fmt(f.protein)}g P`})});meals.forEach((m,i)=>{if(m.name.toLowerCase().includes(q))o.push({type:'meal',i,name:m.name,sub:`Saved meal · ${fmt(m.macros.calories)} kcal`})});diarySearchResults.innerHTML=o.slice(0,20).map(x=>`<div class="search-option" onclick="selectDiary('${x.type}',${x.i})"><strong>${esc(x.name)}</strong><span class="small">${x.sub}</span></div>`).join('')||'<div class="empty">No matches</div>';diarySearchResults.style.display='block'}
+function selectDiary(type,i){diarySelection={type,i};const o=type==='food'?foods[i]:meals[i];diarySelected.style.display='block';diarySelected.innerHTML=`<strong>${esc(o.name)}</strong><div class="small">${type==='food'?(o.basis==='100g'?'Per 100 g':`1 ${esc(servingLabel(o))}`):'Saved meal'}</div>`;diarySearchResults.style.display='none';diarySearch.value='';updateDiaryAmountLabel()}
+function updateDiaryAmountLabel(){if(diarySelection?.type==='food'){const f=foods[diarySelection.i];diaryAmountLabel.textContent=diaryAmountMode.value==='grams'?'Grams':`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`}else diaryAmountLabel.textContent='Number of servings'}
+function addDiaryEntry(){if(!diarySelection)return alert('Choose a saved food or meal.');const a=+diaryAmount.value||0,mode=diaryAmountMode.value,mealType=diaryMealType.value;let e;if(diarySelection.type==='food'){const f=foods[diarySelection.i];e={name:f.name,macros:foodMacros(f,a,mode)}}else{if(mode==='grams')return alert('Saved meals are logged by serving.');const m=meals[diarySelection.i];e={name:m.name,macros:scale(m.macros,a)}}const k=keyFromDate(selectedDate);diary[k]=diary[k]||[];diary[k].push({id:String(Date.now())+Math.random(),mealType,...e});saveAll();renderDiary()}
+function deleteDiaryEntry(id){const k=keyFromDate(selectedDate);diary[k]=(diary[k]||[]).filter(e=>String(e.id)!==String(id));saveAll();renderDiary()}
+function copyPreviousDay(){const d=new Date(selectedDate);d.setDate(d.getDate()-1);const src=diary[keyFromDate(d)]||[];if(!src.length)return alert('No entries on the previous day.');diary[keyFromDate(selectedDate)]=src.map(e=>({...e,id:String(Date.now())+Math.random()}));saveAll();renderDiary()}
+function saveFood(){const name=foodName.value.trim();if(!name)return alert('Enter a food name.');foods.push({name,basis:foodBasis.value,servingName:foodServingName.value.trim()||'serving',servingGrams:+foodServingGrams.value||null,calories:+foodCalories.value||0,protein:+foodProtein.value||0,carbs:+foodCarbs.value||0,fat:+foodFat.value||0,fibre:+foodFibre.value||0});['foodName','foodServingName','foodServingGrams','foodCalories','foodProtein','foodCarbs','foodFat','foodFibre'].forEach(id=>document.getElementById(id).value='');saveAll();renderFoods()}
+function renderFoods(){const q=foodSearch.value.trim().toLowerCase();const items=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q));foodsList.innerHTML=items.length?items.map(({f,i})=>`<div class="item"><div><div class="item-title">${esc(f.name)}</div><div class="item-sub">${fmt(f.calories)} kcal · ${fmt(f.protein)}g P · ${fmt(f.carbs)}g C · ${fmt(f.fat)}g F · ${fmt(f.fibre)}g fibre<br>${f.basis==='100g'?'per 100 g':`per ${esc(servingLabel(f))}`}${f.servingGrams?` · ${fmt(f.servingGrams)} g each`:''}</div></div><div class="item-actions"><button class="danger" onclick="deleteFood(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved foods found.</div>'}
+function deleteFood(i){if(confirm('Delete this food?')){foods.splice(i,1);saveAll();renderFoods()}}
+function renderMealSearch(){const q=mealSearch.value.trim().toLowerCase();if(!q){mealSearchResults.style.display='none';return}const arr=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q)).slice(0,20);mealSearchResults.innerHTML=arr.map(({f,i})=>`<div class="search-option" onclick="selectMealFood(${i})"><strong>${esc(f.name)}</strong><span class="small">${fmt(f.calories)} kcal · ${fmt(f.protein)}g P</span></div>`).join('')||'<div class="empty">No matches</div>';mealSearchResults.style.display='block'}
+function selectMealFood(i){mealSelection=i;const f=foods[i];mealSelected.style.display='block';mealSelected.innerHTML=`<strong>${esc(f.name)}</strong><div class="small">${f.basis==='100g'?'Per 100 g':`1 ${esc(servingLabel(f))}`}</div>`;mealSearchResults.style.display='none';mealSearch.value='';updateMealAmountLabel()}
+function updateMealAmountLabel(){if(mealSelection==null)return;const f=foods[mealSelection];mealAmountLabel.textContent=mealFoodMode.value==='grams'?'Grams':`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`}
+function addMealIngredient(){if(mealSelection==null)return alert('Choose an ingredient.');const f=foods[mealSelection],amount=+mealFoodAmount.value||0,mode=mealFoodMode.value,macros=foodMacros(f,amount,mode);mealBuilder.push({foodIndex:mealSelection,name:f.name,amount,mode,macros});renderMealBuilder()}
+function renderMealBuilder(){ingredientCount.textContent=`${mealBuilder.length} ingredient${mealBuilder.length===1?'':'s'}`;let total=zero();mealBuilder.forEach(x=>total=plus(total,x.macros));mealBuilderList.innerHTML=mealBuilder.length?mealBuilder.map((x,i)=>`<div class="ingredient-card"><div class="ingredient-top"><div><strong>${esc(x.name)}</strong><div class="small">${fmt(x.amount)} ${x.mode==='grams'?'g':esc(servingLabel(foods[x.foodIndex]||{}))}</div></div><button class="danger" style="width:auto;padding:7px 9px" onclick="removeIngredient(${i})">Remove</button></div><div class="ingredient-macros">${fmt(x.macros.calories)} kcal · ${fmt(x.macros.protein)}g protein · ${fmt(x.macros.carbs)}g carbs · ${fmt(x.macros.fat)}g fat · ${fmt(x.macros.fibre)}g fibre</div></div>`).join(''):'<div class="empty">Add as many ingredients as you like.</div>';mealBuilderTotals.innerHTML=`<strong>Meal total:</strong> ${fmt(total.calories)} kcal · ${fmt(total.protein)}g protein · ${fmt(total.carbs)}g carbs · ${fmt(total.fat)}g fat · ${fmt(total.fibre)}g fibre`}
+function removeIngredient(i){mealBuilder.splice(i,1);renderMealBuilder()}
+function saveMeal(){const name=mealName.value.trim();if(!name)return alert('Enter a meal name.');if(!mealBuilder.length)return alert('Add at least one ingredient.');let total=zero();mealBuilder.forEach(x=>total=plus(total,x.macros));meals.push({name,ingredients:mealBuilder.map(x=>({...x})),macros:total});mealBuilder=[];mealName.value='';saveAll();renderMealBuilder();renderMeals()}
+function renderMeals(){const q=mealSavedSearch.value.trim().toLowerCase();const arr=meals.map((m,i)=>({m,i})).filter(x=>x.m.name.toLowerCase().includes(q));mealsList.innerHTML=arr.length?arr.map(({m,i})=>`<div class="item"><div><div class="item-title">${esc(m.name)}</div><div class="item-sub">${fmt(m.macros.calories)} kcal · ${fmt(m.macros.protein)}g P · ${fmt(m.macros.carbs)}g C · ${fmt(m.macros.fat)}g F · ${fmt(m.macros.fibre)}g fibre</div><div>${m.ingredients.map(x=>`<span class="pill">${esc(x.name)} · ${fmt(x.amount)} ${x.mode==='grams'?'g':esc(servingLabel(foods[x.foodIndex]||{}))}</span>`).join('')}</div></div><div class="item-actions"><button class="danger" onclick="deleteMeal(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved meals found.</div>'}
+function deleteMeal(i){if(confirm('Delete this meal?')){meals.splice(i,1);saveAll();renderMeals()}}
+function loadTargets(){targetCalories.value=targets.calories;targetProtein.value=targets.protein;targetCarbs.value=targets.carbs;targetFat.value=targets.fat;targetFibre.value=targets.fibre;fillQuickGoals()}
+function saveTargets(){targets={calories:+targetCalories.value||1550,protein:+targetProtein.value||110,carbs:+targetCarbs.value||165,fat:+targetFat.value||50,fibre:+targetFibre.value||30};saveAll();fillQuickGoals();renderDiary();alert('Goals saved.')}
+function exportData(){const b=new Blob([JSON.stringify({foods,meals,diary,targets},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='macro-tracker-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function resetAll(){if(confirm('Clear all saved data on this device?')){['macroFoods','macroMeals','macroDiary','macroTargets'].forEach(k=>localStorage.removeItem(k));location.reload()}}
+loadTargets();renderFoods();renderMeals();renderMealBuilder();renderDiary();
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}</script>
+</body>
+</html>
