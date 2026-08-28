@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="#f7f6f3">
+<meta name="theme-color" content="#fff8fb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Macro Tracker">
@@ -12,36 +12,37 @@
 <title>Macro Tracker</title>
 <style>
 :root{
-  --bg:#f5f4f1;--card:#fff;--text:#1f1f20;--muted:#77736d;--line:#e8e4dd;
-  --soft:#f0eee9;--accent:#222;--good:#637b68;--danger:#9a4f4a;--shadow:0 8px 26px rgba(30,25,20,.05);
+  --bg:#fff8fb;--card:#ffffff;--text:#292326;--muted:#85777d;--line:#f1dde6;
+  --soft:#fff0f5;--accent:#e8a8bf;--accent-strong:#cf7ea0;--accent-deep:#aa5d7e;
+  --danger:#a05252;--shadow:0 10px 30px rgba(160,90,120,.07);
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.shell{max-width:820px;margin:0 auto;padding:18px 14px 100px}
+.shell{max-width:860px;margin:0 auto;padding:18px 14px 104px}
 h1{font-size:29px;letter-spacing:-.7px;margin:0} h2{font-size:17px;margin:0 0 12px} h3{font-size:14px;margin:0}
 .small{font-size:12px;color:var(--muted)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
 .between{display:flex;align-items:center;justify-content:space-between;gap:10px}.row{display:flex;gap:8px;align-items:center}
-button{border:0;border-radius:13px;padding:11px 13px;background:var(--accent);color:#fff;font:inherit;font-weight:750;cursor:pointer}
-button.secondary{background:var(--soft);color:var(--text)} button.danger{background:#f7e9e7;color:var(--danger)}
+button{border:0;border-radius:13px;padding:11px 13px;background:var(--accent-strong);color:#fff;font:inherit;font-weight:750;cursor:pointer}
+button.secondary{background:var(--soft);color:var(--accent-deep)} button.danger{background:#fbecec;color:var(--danger)}
 input,select{width:100%;border:1px solid var(--line);border-radius:13px;padding:11px 12px;background:#fff;color:var(--text);font:inherit;outline:none}
-input:focus,select:focus{border-color:#b9b3aa}
+input:focus,select:focus{border-color:var(--accent)}
 label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0 5px}
 .grid{display:grid;gap:10px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:620px){.grid-2,.grid-3{grid-template-columns:1fr}}
 .tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);backdrop-filter:blur(12px);z-index:20}
-.tabs-inner{max-width:820px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
-.tab{background:transparent;color:var(--muted);border-radius:0;padding:13px 6px;font-size:12px}.tab.active{color:var(--text);font-weight:800}
+.tabs-inner{max-width:860px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.tab{background:transparent;color:var(--muted);border-radius:0;padding:13px 6px;font-size:12px}.tab.active{color:var(--accent-deep);font-weight:800}
 .view{display:none}.view.active{display:block}
-.date-nav button{width:auto;padding:9px 12px;background:var(--soft);color:var(--text)}
-.ring-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:start}
-@media(max-width:720px){.ring-grid{grid-template-columns:repeat(3,1fr)}} @media(max-width:460px){.ring-grid{grid-template-columns:repeat(2,1fr)}}
-.ring-card{background:#faf9f7;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center}
-.ring{--p:0;--ring:#657a69;width:104px;height:104px;margin:0 auto 8px;border-radius:50%;
- background:conic-gradient(var(--ring) calc(var(--p)*1%), #e9e6e0 0);
+.date-nav button{width:auto;padding:9px 12px;background:var(--soft);color:var(--accent-deep)}
+.ring-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-items:start}
+@media(max-width:820px){.ring-grid{grid-template-columns:repeat(3,1fr)}} @media(max-width:470px){.ring-grid{grid-template-columns:repeat(2,1fr)}}
+.ring-card{background:#fffafb;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center}
+.ring{--p:0;width:102px;height:102px;margin:0 auto 8px;border-radius:50%;
+ background:conic-gradient(var(--accent-strong) calc(var(--p)*1%), #f2e7ec 0);
  display:grid;place-items:center;position:relative}
-.ring:before{content:"";width:78px;height:78px;border-radius:50%;background:#faf9f7;position:absolute}
-.ring-inner{position:relative;z-index:1;line-height:1.05}.ring-inner strong{font-size:20px;display:block}.ring-inner span{font-size:10px;color:var(--muted)}
+.ring:before{content:"";width:76px;height:76px;border-radius:50%;background:#fffafb;position:absolute}
+.ring-inner{position:relative;z-index:1;line-height:1.05}.ring-inner strong{font-size:19px;display:block}.ring-inner span{font-size:10px;color:var(--muted)}
 .ring-card .name{font-weight:750;font-size:13px}.ring-card .goal{font-size:11px;color:var(--muted);margin-top:2px}
 .quick-edit{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .item{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}
@@ -50,17 +51,19 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 .search-results{margin-top:8px;border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#fff;max-height:260px;overflow-y:auto}
 .search-option{padding:11px 12px;border-bottom:1px solid var(--line);cursor:pointer}.search-option:last-child{border-bottom:0}.search-option strong{display:block;font-size:14px}
 .selected-chip{background:var(--soft);border-radius:14px;padding:10px 12px;margin-top:8px}
-.ingredient-card{border:1px solid var(--line);border-radius:16px;padding:11px;margin-top:8px;background:#faf9f7}
+.ingredient-card{border:1px solid var(--line);border-radius:16px;padding:11px;margin-top:8px;background:#fffafb}
 .ingredient-top{display:flex;justify-content:space-between;gap:10px}.ingredient-macros{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.45}
 .pill{display:inline-block;background:var(--soft);border-radius:999px;padding:5px 8px;font-size:11px;margin:5px 4px 0 0}
 .weekly{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}@media(max-width:520px){.weekly{grid-template-columns:1fr}}
-.stat{border:1px solid var(--line);border-radius:16px;padding:12px;background:#faf9f7}.stat strong{font-size:18px;display:block}
+.stat{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fffafb}.stat strong{font-size:18px;display:block}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}.btn-row button{flex:1;min-width:120px}
+.inline-switch{display:flex;gap:6px;flex-wrap:wrap}.inline-switch button{padding:8px 10px;background:var(--soft);color:var(--accent-deep)}.inline-switch button.active{background:var(--accent-strong);color:#fff}
+.water-panel{background:linear-gradient(135deg,#fff3f8,#fffafb);border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:12px}
 </style>
 </head>
 <body>
 <div class="shell">
-<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small">Daily goals, meals & progress</div></header>
+<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small"><strong>V2.5</strong> · Daily goals, meals & progress</div></header>
 
 <section id="diaryView" class="view active">
   <div class="card">
@@ -73,10 +76,36 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 
   <div class="card">
     <div class="between"><h2>Daily progress</h2><button class="secondary" style="width:auto" onclick="toggleQuickGoals()">Edit goals</button></div>
-    <div id="ringGrid" class="ring-grid"></div>
+    <div id="ringGrid" class="ring-grid">
+      <div class="ring-card" id="ringCardCalories">
+        <div class="ring" id="ringCalories" style="--p:0"><div class="ring-inner"><strong id="valCalories">0</strong><span id="unitCalories">kcal</span></div></div>
+        <div class="name">Calories</div><div class="goal" id="goalCalories">0 kcal goal</div>
+      </div>
+      <div class="ring-card" id="ringCardProtein">
+        <div class="ring" id="ringProtein" style="--p:0"><div class="ring-inner"><strong id="valProtein">0</strong><span>g</span></div></div>
+        <div class="name">Protein</div><div class="goal" id="goalProtein">0 g goal</div>
+      </div>
+      <div class="ring-card" id="ringCardCarbs">
+        <div class="ring" id="ringCarbs" style="--p:0"><div class="ring-inner"><strong id="valCarbs">0</strong><span>g</span></div></div>
+        <div class="name">Carbs</div><div class="goal" id="goalCarbs">0 g goal</div>
+      </div>
+      <div class="ring-card" id="ringCardFat">
+        <div class="ring" id="ringFat" style="--p:0"><div class="ring-inner"><strong id="valFat">0</strong><span>g</span></div></div>
+        <div class="name">Fat</div><div class="goal" id="goalFat">0 g goal</div>
+      </div>
+      <div class="ring-card" id="ringCardFibre">
+        <div class="ring" id="ringFibre" style="--p:0"><div class="ring-inner"><strong id="valFibre">0</strong><span>g</span></div></div>
+        <div class="name">Fibre</div><div class="goal" id="goalFibre">0 g goal</div>
+      </div>
+      <div class="ring-card" id="ringCardWater">
+        <div class="ring" id="ringWater" style="--p:0"><div class="ring-inner"><strong id="valWater">0</strong><span id="unitWater"></span></div></div>
+        <div class="name">Water</div><div class="goal" id="goalWater">0 goal</div>
+      </div>
+    </div>
+
     <div id="quickGoals" class="quick-edit" style="display:none">
       <div class="grid grid-3">
-        <div><label>Calories</label><input id="qCalories" type="number"></div>
+        <div><label>Calories / Energy</label><input id="qCalories" type="number"></div>
         <div><label>Protein (g)</label><input id="qProtein" type="number"></div>
         <div><label>Carbs (g)</label><input id="qCarbs" type="number"></div>
         <div><label>Fat (g)</label><input id="qFat" type="number"></div>
@@ -98,11 +127,27 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
     <div id="diarySelected" class="selected-chip" style="display:none"></div>
     <div id="diarySearchResults" class="search-results" style="display:none"></div>
     <div class="grid grid-2" style="margin-top:10px">
-      <div><label>Meal</label><select id="diaryMealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
-      <div><label>Amount type</label><select id="diaryAmountMode" onchange="updateDiaryAmountLabel()"><option value="servings">Serving</option><option value="grams">Grams</option></select></div>
+      <div><label>Meal</label><select id="diaryMealType">
+        <option>Breakfast</option><option>Pre-workout</option><option>Post-workout</option><option>Lunch</option><option>Dinner</option><option>Dessert</option><option>Snack</option>
+      </select></div>
+      <div><label>Amount type</label><select id="diaryAmountMode" onchange="updateDiaryAmountLabel()"><option value="servings">Serving</option><option value="baseunit">Food unit</option></select></div>
       <div><label id="diaryAmountLabel">Amount</label><input id="diaryAmount" type="number" step="0.1" min="0" value="1"></div>
     </div>
     <div style="margin-top:10px"><button onclick="addDiaryEntry()">Add to diary</button></div>
+
+    <div class="water-panel" style="margin-top:18px">
+      <div class="between">
+        <div>
+          <strong>Log water</strong>
+          <div id="waterHelp" class="small"></div>
+        </div>
+      </div>
+      <div class="grid grid-2" style="margin-top:10px">
+        <div><label>Amount</label><input id="waterLogAmount" type="number" step="0.5" min="0" value="0.5"></div>
+        <div><label>Unit</label><select id="waterLogUnit"></select></div>
+      </div>
+      <div style="margin-top:10px"><button onclick="logWater()">Add water</button></div>
+    </div>
   </div>
 
   <div class="card">
@@ -113,13 +158,15 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 
 <section id="foodsView" class="view">
   <div class="card">
-    <h2>Save a food</h2>
+    <div class="between"><h2>Save a food</h2><div class="inline-switch"><button id="energyKcalBtn" class="active" onclick="setEnergyMode('kcal')">kcal</button><button id="energyKjBtn" onclick="setEnergyMode('kj')">kJ</button></div></div>
     <div class="grid grid-2">
       <div><label>Name</label><input id="foodName" placeholder="e.g. Edam cheese"></div>
-      <div><label>Nutrition basis</label><select id="foodBasis"><option value="100g">Per 100 g</option><option value="serving">Per serving</option></select></div>
-      <div><label>Custom serving name</label><input id="foodServingName" placeholder="e.g. slice, wrap, scoop"></div>
-      <div><label>Serving size in grams (optional)</label><input id="foodServingGrams" type="number" step="0.1" min="0"></div>
-      <div><label>Calories</label><input id="foodCalories" type="number" step="0.1" min="0"></div>
+      <div><label>Measurement unit</label><select id="foodUnitSelect" onchange="toggleCustomFoodUnit()"></select></div>
+      <div id="customFoodUnitWrap" style="display:none"><label>Custom measurement unit</label><input id="customFoodUnit" placeholder="e.g. scoop, pouch, bottle"></div>
+      <div><label>Nutrition basis amount</label><input id="foodBasisAmount" type="number" step="0.1" min="0" value="100"></div>
+      <div><label>Custom serving name (optional)</label><input id="foodServingName" placeholder="e.g. slice, wrap"></div>
+      <div><label>Serving size in chosen unit (optional)</label><input id="foodServingSize" type="number" step="0.1" min="0"></div>
+      <div><label id="energyLabel">Calories (kcal)</label><input id="foodEnergy" type="number" step="0.1" min="0"></div>
       <div><label>Protein (g)</label><input id="foodProtein" type="number" step="0.1" min="0"></div>
       <div><label>Carbs (g)</label><input id="foodCarbs" type="number" step="0.1" min="0"></div>
       <div><label>Fat (g)</label><input id="foodFat" type="number" step="0.1" min="0"></div>
@@ -143,11 +190,10 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
       <div id="mealSearchResults" class="search-results" style="display:none"></div>
     </div>
     <div class="grid grid-2" style="margin-top:10px">
-      <div><label>Amount type</label><select id="mealFoodMode" onchange="updateMealAmountLabel()"><option value="servings">Serving</option><option value="grams">Grams</option></select></div>
+      <div><label>Amount type</label><select id="mealFoodMode" onchange="updateMealAmountLabel()"><option value="servings">Serving</option><option value="baseunit">Food unit</option></select></div>
       <div><label id="mealAmountLabel">Amount</label><input id="mealFoodAmount" type="number" step="0.1" min="0" value="1"></div>
     </div>
     <div style="margin-top:10px"><button class="secondary" onclick="addMealIngredient()">Add ingredient</button></div>
-
     <div style="margin-top:15px">
       <div class="between"><h3>Ingredients</h3><span id="ingredientCount" class="small">0 ingredients</span></div>
       <div id="mealBuilderList"></div>
@@ -155,7 +201,6 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
     </div>
     <div style="margin-top:12px"><button onclick="saveMeal()">Save complete meal</button></div>
   </div>
-
   <div class="card">
     <h2>Saved meals</h2>
     <input id="mealSavedSearch" placeholder="Search saved meals..." oninput="renderMeals()">
@@ -167,14 +212,35 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
   <div class="card">
     <h2>Macro goals</h2>
     <div class="grid grid-2">
-      <div><label>Calories</label><input id="targetCalories" type="number"></div>
+      <div><label id="targetEnergyLabel">Calories goal (kcal)</label><input id="targetCalories" type="number"></div>
       <div><label>Protein (g)</label><input id="targetProtein" type="number"></div>
       <div><label>Carbs (g)</label><input id="targetCarbs" type="number"></div>
       <div><label>Fat (g)</label><input id="targetFat" type="number"></div>
       <div><label>Fibre (g)</label><input id="targetFibre" type="number"></div>
+      <div><label>Energy display</label><select id="settingsEnergyMode" onchange="changeDisplayEnergyMode(this.value)"><option value="kcal">kcal</option><option value="kj">kJ</option></select></div>
     </div>
-    <div style="margin-top:10px"><button onclick="saveTargets()">Save goals</button></div>
+    <div style="margin-top:10px"><button onclick="saveTargets()">Save macro goals</button></div>
   </div>
+
+  <div class="card">
+    <h2>Water goal</h2>
+    <div class="grid grid-2">
+      <div><label>Goal type</label><select id="waterGoalType" onchange="renderWaterSettings()"><option value="volume">Volume</option><option value="custom">Custom container</option></select></div>
+      <div id="waterVolumeUnitWrap"><label>Volume unit</label><select id="waterVolumeUnit"><option value="ml">mL</option><option value="l">L</option></select></div>
+      <div><label>Daily goal amount</label><input id="waterGoalAmount" type="number" step="0.1" min="0"></div>
+      <div id="waterCustomNameWrap" style="display:none"><label>Custom container name</label><input id="waterCustomName" placeholder="e.g. Stanley bottle"></div>
+      <div id="waterCustomVolumeWrap" style="display:none"><label>Container volume in mL (optional)</label><input id="waterCustomVolumeMl" type="number" step="1" min="0" placeholder="e.g. 1200"></div>
+      <div><label>Logging step</label><select id="waterStep"><option value="0.25">Quarter</option><option value="0.5">Half</option><option value="1">Whole</option></select></div>
+    </div>
+    <div style="margin-top:10px"><button onclick="saveWaterGoal()">Save water goal</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Custom food measurement units</h2>
+    <div class="grid grid-2"><div><label>New unit name</label><input id="newFoodUnit" placeholder="e.g. pouch, scoop, bottle"></div><div style="align-self:end"><button onclick="addCustomFoodUnit()">Add unit</button></div></div>
+    <div id="customUnitList" style="margin-top:10px"></div>
+  </div>
+
   <div class="card">
     <h2>Data</h2>
     <p class="small">Saved locally on this device/browser.</p>
@@ -191,12 +257,45 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 </div></nav>
 
 <script>
+const KCAL_TO_KJ=4.184;
 const DEFAULT_TARGETS={calories:1550,protein:110,carbs:165,fat:50,fibre:30};
+const DEFAULT_WATER={type:'volume',amount:2000,unit:'ml',customName:'Stanley bottle',customVolumeMl:1200,step:0.5};
+const DEFAULT_UNITS=['g','ml','L','oz','cup','tbsp','tsp','piece'];
 let foods=JSON.parse(localStorage.getItem('macroFoods')||'[]');
 let meals=JSON.parse(localStorage.getItem('macroMeals')||'[]');
 let diary=JSON.parse(localStorage.getItem('macroDiary')||'{}');
+let waterDiary=JSON.parse(localStorage.getItem('macroWaterDiary')||'{}');
 let targets=JSON.parse(localStorage.getItem('macroTargets')||JSON.stringify(DEFAULT_TARGETS));
+let waterGoal=JSON.parse(localStorage.getItem('macroWaterGoal')||JSON.stringify(DEFAULT_WATER));
+let customUnits=JSON.parse(localStorage.getItem('macroCustomUnits')||'[]');
+let displayEnergyMode=localStorage.getItem('macroEnergyMode')||'kcal';
+let entryEnergyMode='kcal';
 let selectedDate=new Date(),diarySelection=null,mealSelection=null,mealBuilder=[];
+
+const byId=id=>document.getElementById(id);
+const dateTitle=byId('dateTitle'),dateSubtitle=byId('dateSubtitle'),ringGrid=byId('ringGrid'),
+weeklyStats=byId('weeklyStats'),quickGoals=byId('quickGoals'),qCalories=byId('qCalories'),
+qProtein=byId('qProtein'),qCarbs=byId('qCarbs'),qFat=byId('qFat'),qFibre=byId('qFibre'),
+diarySearch=byId('diarySearch'),diarySelected=byId('diarySelected'),diarySearchResults=byId('diarySearchResults'),
+diaryMealType=byId('diaryMealType'),diaryAmountMode=byId('diaryAmountMode'),diaryAmountLabel=byId('diaryAmountLabel'),
+diaryAmount=byId('diaryAmount'),diaryList=byId('diaryList'),foodName=byId('foodName'),
+foodUnitSelect=byId('foodUnitSelect'),customFoodUnitWrap=byId('customFoodUnitWrap'),customFoodUnit=byId('customFoodUnit'),
+foodBasisAmount=byId('foodBasisAmount'),foodServingName=byId('foodServingName'),foodServingSize=byId('foodServingSize'),
+foodEnergy=byId('foodEnergy'),foodProtein=byId('foodProtein'),foodCarbs=byId('foodCarbs'),foodFat=byId('foodFat'),
+foodFibre=byId('foodFibre'),foodSearch=byId('foodSearch'),foodsList=byId('foodsList'),
+energyKcalBtn=byId('energyKcalBtn'),energyKjBtn=byId('energyKjBtn'),energyLabel=byId('energyLabel'),
+mealName=byId('mealName'),mealSearch=byId('mealSearch'),mealSelected=byId('mealSelected'),
+mealSearchResults=byId('mealSearchResults'),mealFoodMode=byId('mealFoodMode'),mealAmountLabel=byId('mealAmountLabel'),
+mealFoodAmount=byId('mealFoodAmount'),ingredientCount=byId('ingredientCount'),mealBuilderList=byId('mealBuilderList'),
+mealBuilderTotals=byId('mealBuilderTotals'),mealSavedSearch=byId('mealSavedSearch'),mealsList=byId('mealsList'),
+targetEnergyLabel=byId('targetEnergyLabel'),targetCalories=byId('targetCalories'),targetProtein=byId('targetProtein'),
+targetCarbs=byId('targetCarbs'),targetFat=byId('targetFat'),targetFibre=byId('targetFibre'),
+settingsEnergyMode=byId('settingsEnergyMode'),waterGoalType=byId('waterGoalType'),waterVolumeUnitWrap=byId('waterVolumeUnitWrap'),
+waterVolumeUnit=byId('waterVolumeUnit'),waterGoalAmount=byId('waterGoalAmount'),waterCustomNameWrap=byId('waterCustomNameWrap'),
+waterCustomName=byId('waterCustomName'),waterCustomVolumeWrap=byId('waterCustomVolumeWrap'),waterCustomVolumeMl=byId('waterCustomVolumeMl'),
+waterStep=byId('waterStep'),newFoodUnit=byId('newFoodUnit'),customUnitList=byId('customUnitList'),
+waterHelp=byId('waterHelp'),waterLogAmount=byId('waterLogAmount'),waterLogUnit=byId('waterLogUnit');
+
 
 function keyFromDate(d){const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
 function fmt(n){return Math.round((Number(n)||0)*10)/10}
@@ -204,45 +303,160 @@ function zero(){return{calories:0,protein:0,carbs:0,fat:0,fibre:0}}
 function plus(a,b){return{calories:a.calories+b.calories,protein:a.protein+b.protein,carbs:a.carbs+b.carbs,fat:a.fat+b.fat,fibre:a.fibre+b.fibre}}
 function scale(m,f){return{calories:m.calories*f,protein:m.protein*f,carbs:m.carbs*f,fat:m.fat*f,fibre:m.fibre*f}}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function saveAll(){localStorage.setItem('macroFoods',JSON.stringify(foods));localStorage.setItem('macroMeals',JSON.stringify(meals));localStorage.setItem('macroDiary',JSON.stringify(diary));localStorage.setItem('macroTargets',JSON.stringify(targets))}
-function servingLabel(f){return f.servingName?.trim()||'serving'}
-function foodMacros(f,a,mode){a=Number(a)||0;if(mode==='grams'){if(f.basis==='100g')return scale(f,a/100);if(Number(f.servingGrams)>0)return scale(f,a/Number(f.servingGrams));return zero()}return scale(f,a)}
+function energyDisplay(kcal){return displayEnergyMode==='kj'?fmt(kcal*KCAL_TO_KJ):fmt(kcal)}
+function energyUnit(){return displayEnergyMode==='kj'?'kJ':'kcal'}
+function energyInputToKcal(v){return entryEnergyMode==='kj'?(Number(v)||0)/KCAL_TO_KJ:(Number(v)||0)}
+
+function migrateLegacyData(){
+ foods=foods.map(f=>{
+   if(f.unit && f.basisAmount) return f;
+   const oldBasis=f.basis||'100g';
+   const inferredUnit='g';
+   const inferredBasisAmount=oldBasis==='100g'?100:(Number(f.servingGrams)||1);
+   return {
+     ...f,
+     unit:f.unit||inferredUnit,
+     basisAmount:Number(f.basisAmount)||inferredBasisAmount,
+     servingName:(f.servingName||'').trim(),
+     servingSize:Number(f.servingSize)||Number(f.servingGrams)||null
+   };
+ });
+ if(!waterGoal || typeof waterGoal!=='object') waterGoal={...DEFAULT_WATER};
+ if(!waterGoal.type) waterGoal={...DEFAULT_WATER,...waterGoal};
+}
+migrateLegacyData();
+
+function saveAll(){
+ localStorage.setItem('macroFoods',JSON.stringify(foods));localStorage.setItem('macroMeals',JSON.stringify(meals));
+ localStorage.setItem('macroDiary',JSON.stringify(diary));localStorage.setItem('macroWaterDiary',JSON.stringify(waterDiary));
+ localStorage.setItem('macroTargets',JSON.stringify(targets));localStorage.setItem('macroWaterGoal',JSON.stringify(waterGoal));
+ localStorage.setItem('macroCustomUnits',JSON.stringify(customUnits));localStorage.setItem('macroEnergyMode',displayEnergyMode)
+}
+function servingLabel(f){return f.servingName?.trim()||''}
+function foodMacros(f,a,mode){
+ a=Number(a)||0;
+ if(mode==='baseunit') return scale(f,a/(Number(f.basisAmount)||1));
+ if(servingLabel(f) && Number(f.servingSize)>0) return scale(f,(a*Number(f.servingSize))/(Number(f.basisAmount)||1));
+ return scale(f,a);
+}
 function switchTab(name,b){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.tab').forEach(v=>v.classList.remove('active'));document.getElementById(name+'View').classList.add('active');b.classList.add('active')}
 function changeDate(n){selectedDate.setDate(selectedDate.getDate()+n);renderDiary()}
 function renderDate(){const today=keyFromDate(selectedDate)===keyFromDate(new Date());dateTitle.textContent=selectedDate.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});dateSubtitle.textContent=today?'Today':selectedDate.getFullYear()}
 function totalsFor(k){let t=zero();(diary[k]||[]).forEach(e=>t=plus(t,e.macros));return t}
-function renderRings(t){
- const data=[['Calories','calories','kcal'],['Protein','protein','g'],['Carbs','carbs','g'],['Fat','fat','g'],['Fibre','fibre','g']];
- ringGrid.innerHTML=data.map(([name,k,u])=>{const p=Math.min(100,t[k]/targets[k]*100||0);return `<div class="ring-card"><div class="ring" style="--p:${p}"><div class="ring-inner"><strong>${fmt(t[k])}</strong><span>${u}</span></div></div><div class="name">${name}</div><div class="goal">${fmt(targets[k])}${u} goal</div></div>`}).join('');
+function waterGoalBaseUnits(){
+ if(waterGoal.type==='volume') return waterGoal.unit==='l'?waterGoal.amount*1000:waterGoal.amount;
+ return waterGoal.amount;
 }
-function renderWeekly(){let sum=zero();for(let i=0;i<7;i++){const d=new Date(selectedDate);d.setDate(d.getDate()-i);sum=plus(sum,totalsFor(keyFromDate(d)))}const a=scale(sum,1/7);weeklyStats.innerHTML=`<div class="stat"><span class="small">Calories</span><strong>${fmt(a.calories)}</strong><span class="small">kcal/day</span></div><div class="stat"><span class="small">Protein</span><strong>${fmt(a.protein)} g</strong><span class="small">per day</span></div><div class="stat"><span class="small">Fibre</span><strong>${fmt(a.fibre)} g</strong><span class="small">per day</span></div>`}
-function renderDiary(){renderDate();const k=keyFromDate(selectedDate),entries=diary[k]||[];let total=zero();entries.forEach(e=>total=plus(total,e.macros));renderRings(total);renderWeekly();const groups=['Breakfast','Lunch','Dinner','Snack'];if(!entries.length){diaryList.innerHTML='<div class="empty">Nothing logged for this day.</div>';return}diaryList.innerHTML=groups.map(g=>{const es=entries.filter(e=>e.mealType===g);if(!es.length)return'';let gt=zero();es.forEach(e=>gt=plus(gt,e.macros));return `<div class="meal-block"><div class="meal-head"><h3>${g}</h3><span class="small">${fmt(gt.calories)} kcal · ${fmt(gt.protein)}g P · ${fmt(gt.fibre)}g fibre</span></div>${es.map(e=>`<div class="item"><div><div class="item-title">${esc(e.name)}</div><div class="item-sub">${fmt(e.macros.calories)} kcal · ${fmt(e.macros.protein)}g P · ${fmt(e.macros.carbs)}g C · ${fmt(e.macros.fat)}g F · ${fmt(e.macros.fibre)}g fibre</div></div><div class="item-actions"><button class="danger" onclick="deleteDiaryEntry('${e.id}')">Delete</button></div></div>`).join('')}</div>`}).join('')}
+function waterTodayBase(){return Number(waterDiary[keyFromDate(selectedDate)]||0)}
+function waterDisplayText(v){
+ if(waterGoal.type==='volume'){
+   if(waterGoal.unit==='l') return `${fmt(v/1000)} L`;
+   return `${fmt(v)} mL`;
+ }
+ return `${fmt(v)} ${waterGoal.customName||'container'}${v===1?'':'s'}`;
+}
+function renderRings(t){
+ const waterNow=waterTodayBase();
+ const waterGoalBase=Math.max(0.0001, Number(waterGoalBaseUnits())||0.0001);
+
+ function setRing(ringId,valueId,goalId,current,goal,progress,unitId,unitText){
+   const ring=document.getElementById(ringId);
+   const value=document.getElementById(valueId);
+   const goalEl=document.getElementById(goalId);
+   if(ring) ring.style.setProperty('--p', Math.max(0,Math.min(100,Number(progress)||0)));
+   if(value) value.textContent=current;
+   if(goalEl) goalEl.textContent=goal;
+   if(unitId){
+     const unitEl=document.getElementById(unitId);
+     if(unitEl) unitEl.textContent=unitText||'';
+   }
+ }
+
+ setRing('ringCalories','valCalories','goalCalories',
+   energyDisplay(t.calories),
+   `${energyDisplay(targets.calories)} ${energyUnit()} goal`,
+   (Number(t.calories)||0)/(Number(targets.calories)||1)*100,
+   'unitCalories',energyUnit());
+
+ setRing('ringProtein','valProtein','goalProtein',
+   fmt(t.protein),`${fmt(targets.protein)} g goal`,
+   (Number(t.protein)||0)/(Number(targets.protein)||1)*100);
+
+ setRing('ringCarbs','valCarbs','goalCarbs',
+   fmt(t.carbs),`${fmt(targets.carbs)} g goal`,
+   (Number(t.carbs)||0)/(Number(targets.carbs)||1)*100);
+
+ setRing('ringFat','valFat','goalFat',
+   fmt(t.fat),`${fmt(targets.fat)} g goal`,
+   (Number(t.fat)||0)/(Number(targets.fat)||1)*100);
+
+ setRing('ringFibre','valFibre','goalFibre',
+   fmt(t.fibre),`${fmt(targets.fibre)} g goal`,
+   (Number(t.fibre)||0)/(Number(targets.fibre)||1)*100);
+
+ const waterCurrentText=waterDisplayText(waterNow);
+ const waterGoalText=waterDisplayText(waterGoalBase);
+ setRing('ringWater','valWater','goalWater',
+   waterCurrentText,`${waterGoalText} goal`,
+   waterNow/waterGoalBase*100,'unitWater','');
+
+ const wh=document.getElementById('waterHelp');
+ if(wh){
+   wh.textContent=waterGoal.type==='custom'
+     ? `Goal: ${waterGoal.amount} ${waterGoal.customName||'container'}${waterGoal.amount===1?'':'s'} · log in ${waterGoal.step} increments`
+     : `Goal: ${waterGoal.amount} ${waterGoal.unit}`;
+ }
+ renderWaterLogUnits();
+}
+function renderWeekly(){let sum=zero();for(let i=0;i<7;i++){const d=new Date(selectedDate);d.setDate(d.getDate()-i);sum=plus(sum,totalsFor(keyFromDate(d)))}const a=scale(sum,1/7);weeklyStats.innerHTML=`<div class="stat"><span class="small">Energy</span><strong>${energyDisplay(a.calories)} ${energyUnit()}</strong><span class="small">per day</span></div><div class="stat"><span class="small">Protein</span><strong>${fmt(a.protein)} g</strong><span class="small">per day</span></div><div class="stat"><span class="small">Fibre</span><strong>${fmt(a.fibre)} g</strong><span class="small">per day</span></div>`}
+function renderDiary(){
+ renderDate();const k=keyFromDate(selectedDate),entries=diary[k]||[];let total=zero();entries.forEach(e=>total=plus(total,e.macros));renderRings(total);renderWeekly();
+ const groups=['Breakfast','Pre-workout','Post-workout','Lunch','Dinner','Dessert','Snack'];
+ if(!entries.length){diaryList.innerHTML='<div class="empty">Nothing logged for this day.</div>';return}
+ diaryList.innerHTML=groups.map(g=>{const es=entries.filter(e=>e.mealType===g);if(!es.length)return'';let gt=zero();es.forEach(e=>gt=plus(gt,e.macros));return `<div class="meal-block"><div class="meal-head"><h3>${g}</h3><span class="small">${energyDisplay(gt.calories)} ${energyUnit()} · ${fmt(gt.protein)}g P · ${fmt(gt.fibre)}g fibre</span></div>${es.map(e=>`<div class="item"><div><div class="item-title">${esc(e.name)}</div><div class="item-sub">${energyDisplay(e.macros.calories)} ${energyUnit()} · ${fmt(e.macros.protein)}g P · ${fmt(e.macros.carbs)}g C · ${fmt(e.macros.fat)}g F · ${fmt(e.macros.fibre)}g fibre</div></div><div class="item-actions"><button class="danger" onclick="deleteDiaryEntry('${e.id}')">Delete</button></div></div>`).join('')}</div>`}).join('')
+}
 function toggleQuickGoals(){quickGoals.style.display=quickGoals.style.display==='none'?'block':'none';fillQuickGoals()}
-function fillQuickGoals(){qCalories.value=targets.calories;qProtein.value=targets.protein;qCarbs.value=targets.carbs;qFat.value=targets.fat;qFibre.value=targets.fibre}
-function saveQuickGoals(){targets={calories:+qCalories.value||1550,protein:+qProtein.value||110,carbs:+qCarbs.value||165,fat:+qFat.value||50,fibre:+qFibre.value||30};saveAll();loadTargets();renderDiary();quickGoals.style.display='none'}
-function renderDiarySearch(){const q=diarySearch.value.trim().toLowerCase();if(!q){diarySearchResults.style.display='none';return}let o=[];foods.forEach((f,i)=>{if(f.name.toLowerCase().includes(q))o.push({type:'food',i,name:f.name,sub:`${fmt(f.calories)} kcal · ${fmt(f.protein)}g P`})});meals.forEach((m,i)=>{if(m.name.toLowerCase().includes(q))o.push({type:'meal',i,name:m.name,sub:`Saved meal · ${fmt(m.macros.calories)} kcal`})});diarySearchResults.innerHTML=o.slice(0,20).map(x=>`<div class="search-option" onclick="selectDiary('${x.type}',${x.i})"><strong>${esc(x.name)}</strong><span class="small">${x.sub}</span></div>`).join('')||'<div class="empty">No matches</div>';diarySearchResults.style.display='block'}
-function selectDiary(type,i){diarySelection={type,i};const o=type==='food'?foods[i]:meals[i];diarySelected.style.display='block';diarySelected.innerHTML=`<strong>${esc(o.name)}</strong><div class="small">${type==='food'?(o.basis==='100g'?'Per 100 g':`1 ${esc(servingLabel(o))}`):'Saved meal'}</div>`;diarySearchResults.style.display='none';diarySearch.value='';updateDiaryAmountLabel()}
-function updateDiaryAmountLabel(){if(diarySelection?.type==='food'){const f=foods[diarySelection.i];diaryAmountLabel.textContent=diaryAmountMode.value==='grams'?'Grams':`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`}else diaryAmountLabel.textContent='Number of servings'}
-function addDiaryEntry(){if(!diarySelection)return alert('Choose a saved food or meal.');const a=+diaryAmount.value||0,mode=diaryAmountMode.value,mealType=diaryMealType.value;let e;if(diarySelection.type==='food'){const f=foods[diarySelection.i];e={name:f.name,macros:foodMacros(f,a,mode)}}else{if(mode==='grams')return alert('Saved meals are logged by serving.');const m=meals[diarySelection.i];e={name:m.name,macros:scale(m.macros,a)}}const k=keyFromDate(selectedDate);diary[k]=diary[k]||[];diary[k].push({id:String(Date.now())+Math.random(),mealType,...e});saveAll();renderDiary()}
+function fillQuickGoals(){qCalories.value=displayEnergyMode==='kj'?fmt(targets.calories*KCAL_TO_KJ):targets.calories;qProtein.value=targets.protein;qCarbs.value=targets.carbs;qFat.value=targets.fat;qFibre.value=targets.fibre}
+function saveQuickGoals(){targets={calories:displayEnergyMode==='kj'?(+qCalories.value||0)/KCAL_TO_KJ:(+qCalories.value||1550),protein:+qProtein.value||110,carbs:+qCarbs.value||165,fat:+qFat.value||50,fibre:+qFibre.value||30};saveAll();loadTargets();renderDiary();quickGoals.style.display='none'}
+function renderDiarySearch(){const q=diarySearch.value.trim().toLowerCase();if(!q){diarySearchResults.style.display='none';return}let o=[];foods.forEach((f,i)=>{if(f.name.toLowerCase().includes(q))o.push({type:'food',i,name:f.name,sub:`${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P`})});meals.forEach((m,i)=>{if(m.name.toLowerCase().includes(q))o.push({type:'meal',i,name:m.name,sub:`Saved meal · ${energyDisplay(m.macros.calories)} ${energyUnit()}`})});diarySearchResults.innerHTML=o.slice(0,20).map(x=>`<div class="search-option" onclick="selectDiary('${x.type}',${x.i})"><strong>${esc(x.name)}</strong><span class="small">${x.sub}</span></div>`).join('')||'<div class="empty">No matches</div>';diarySearchResults.style.display='block'}
+function selectDiary(type,i){diarySelection={type,i};const o=type==='food'?foods[i]:meals[i];diarySelected.style.display='block';diarySelected.innerHTML=`<strong>${esc(o.name)}</strong><div class="small">${type==='food'?`${o.basisAmount} ${esc(o.unit)} nutrition basis`:'Saved meal'}</div>`;diarySearchResults.style.display='none';diarySearch.value='';updateDiaryAmountLabel()}
+function updateDiaryAmountLabel(){if(diarySelection?.type==='food'){const f=foods[diarySelection.i];if(diaryAmountMode.value==='baseunit'){diaryAmountLabel.textContent=`Amount (${f.unit})`}else diaryAmountLabel.textContent=servingLabel(f)?`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`:'Number of servings'}else diaryAmountLabel.textContent='Number of servings'}
+function addDiaryEntry(){if(!diarySelection)return alert('Choose a saved food or meal.');const a=+diaryAmount.value||0,mode=diaryAmountMode.value,mealType=diaryMealType.value;let e;if(diarySelection.type==='food'){const f=foods[diarySelection.i];e={name:f.name,macros:foodMacros(f,a,mode)}}else{if(mode==='baseunit')return alert('Saved meals are logged by serving.');const m=meals[diarySelection.i];e={name:m.name,macros:scale(m.macros,a)}}const k=keyFromDate(selectedDate);diary[k]=diary[k]||[];diary[k].push({id:String(Date.now())+Math.random(),mealType,...e});saveAll();renderDiary()}
 function deleteDiaryEntry(id){const k=keyFromDate(selectedDate);diary[k]=(diary[k]||[]).filter(e=>String(e.id)!==String(id));saveAll();renderDiary()}
-function copyPreviousDay(){const d=new Date(selectedDate);d.setDate(d.getDate()-1);const src=diary[keyFromDate(d)]||[];if(!src.length)return alert('No entries on the previous day.');diary[keyFromDate(selectedDate)]=src.map(e=>({...e,id:String(Date.now())+Math.random()}));saveAll();renderDiary()}
-function saveFood(){const name=foodName.value.trim();if(!name)return alert('Enter a food name.');foods.push({name,basis:foodBasis.value,servingName:foodServingName.value.trim()||'serving',servingGrams:+foodServingGrams.value||null,calories:+foodCalories.value||0,protein:+foodProtein.value||0,carbs:+foodCarbs.value||0,fat:+foodFat.value||0,fibre:+foodFibre.value||0});['foodName','foodServingName','foodServingGrams','foodCalories','foodProtein','foodCarbs','foodFat','foodFibre'].forEach(id=>document.getElementById(id).value='');saveAll();renderFoods()}
-function renderFoods(){const q=foodSearch.value.trim().toLowerCase();const items=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q));foodsList.innerHTML=items.length?items.map(({f,i})=>`<div class="item"><div><div class="item-title">${esc(f.name)}</div><div class="item-sub">${fmt(f.calories)} kcal · ${fmt(f.protein)}g P · ${fmt(f.carbs)}g C · ${fmt(f.fat)}g F · ${fmt(f.fibre)}g fibre<br>${f.basis==='100g'?'per 100 g':`per ${esc(servingLabel(f))}`}${f.servingGrams?` · ${fmt(f.servingGrams)} g each`:''}</div></div><div class="item-actions"><button class="danger" onclick="deleteFood(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved foods found.</div>'}
+function copyPreviousDay(){const d=new Date(selectedDate);d.setDate(d.getDate()-1);const src=diary[keyFromDate(d)]||[];if(!src.length)return alert('No entries on the previous day.');diary[keyFromDate(selectedDate)]=src.map(e=>({...e,id:String(Date.now())+Math.random()}));waterDiary[keyFromDate(selectedDate)]=waterDiary[keyFromDate(d)]||0;saveAll();renderDiary()}
+function setEnergyMode(mode){entryEnergyMode=mode;energyKcalBtn.classList.toggle('active',mode==='kcal');energyKjBtn.classList.toggle('active',mode==='kj');energyLabel.textContent=mode==='kcal'?'Calories (kcal)':'Energy (kJ)'}
+function changeDisplayEnergyMode(mode){displayEnergyMode=mode;saveAll();loadTargets();renderDiary();renderFoods();renderMeals()}
+function saveFood(){
+ const name=foodName.value.trim();if(!name)return alert('Enter a food name.');
+ const unit=foodUnitSelect.value==='__custom__'?customFoodUnit.value.trim():foodUnitSelect.value;if(!unit)return alert('Choose or enter a measurement unit.');
+ foods.push({name,unit,basisAmount:+foodBasisAmount.value||1,servingName:foodServingName.value.trim(),servingSize:+foodServingSize.value||null,calories:energyInputToKcal(foodEnergy.value),protein:+foodProtein.value||0,carbs:+foodCarbs.value||0,fat:+foodFat.value||0,fibre:+foodFibre.value||0});
+ ['foodName','customFoodUnit','foodServingName','foodServingSize','foodEnergy','foodProtein','foodCarbs','foodFat','foodFibre'].forEach(id=>document.getElementById(id).value='');foodBasisAmount.value=100;saveAll();renderFoods()
+}
+function renderFoods(){const q=foodSearch.value.trim().toLowerCase();const items=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q));foodsList.innerHTML=items.length?items.map(({f,i})=>`<div class="item"><div><div class="item-title">${esc(f.name)}</div><div class="item-sub">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P · ${fmt(f.carbs)}g C · ${fmt(f.fat)}g F · ${fmt(f.fibre)}g fibre<br>per ${fmt(f.basisAmount)} ${esc(f.unit)}${servingLabel(f)?` · ${esc(servingLabel(f))}${f.servingSize?` = ${fmt(f.servingSize)} ${esc(f.unit)}`:''}`:''}</div></div><div class="item-actions"><button class="danger" onclick="deleteFood(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved foods found.</div>'}
 function deleteFood(i){if(confirm('Delete this food?')){foods.splice(i,1);saveAll();renderFoods()}}
-function renderMealSearch(){const q=mealSearch.value.trim().toLowerCase();if(!q){mealSearchResults.style.display='none';return}const arr=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q)).slice(0,20);mealSearchResults.innerHTML=arr.map(({f,i})=>`<div class="search-option" onclick="selectMealFood(${i})"><strong>${esc(f.name)}</strong><span class="small">${fmt(f.calories)} kcal · ${fmt(f.protein)}g P</span></div>`).join('')||'<div class="empty">No matches</div>';mealSearchResults.style.display='block'}
-function selectMealFood(i){mealSelection=i;const f=foods[i];mealSelected.style.display='block';mealSelected.innerHTML=`<strong>${esc(f.name)}</strong><div class="small">${f.basis==='100g'?'Per 100 g':`1 ${esc(servingLabel(f))}`}</div>`;mealSearchResults.style.display='none';mealSearch.value='';updateMealAmountLabel()}
-function updateMealAmountLabel(){if(mealSelection==null)return;const f=foods[mealSelection];mealAmountLabel.textContent=mealFoodMode.value==='grams'?'Grams':`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`}
+function renderMealSearch(){const q=mealSearch.value.trim().toLowerCase();if(!q){mealSearchResults.style.display='none';return}const arr=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q)).slice(0,20);mealSearchResults.innerHTML=arr.map(({f,i})=>`<div class="search-option" onclick="selectMealFood(${i})"><strong>${esc(f.name)}</strong><span class="small">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P</span></div>`).join('')||'<div class="empty">No matches</div>';mealSearchResults.style.display='block'}
+function selectMealFood(i){mealSelection=i;const f=foods[i];mealSelected.style.display='block';mealSelected.innerHTML=`<strong>${esc(f.name)}</strong><div class="small">${fmt(f.basisAmount)} ${esc(f.unit)} nutrition basis</div>`;mealSearchResults.style.display='none';mealSearch.value='';updateMealAmountLabel()}
+function updateMealAmountLabel(){if(mealSelection==null)return;const f=foods[mealSelection];mealAmountLabel.textContent=mealFoodMode.value==='baseunit'?`Amount (${f.unit})`:(servingLabel(f)?`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`:'Number of servings')}
 function addMealIngredient(){if(mealSelection==null)return alert('Choose an ingredient.');const f=foods[mealSelection],amount=+mealFoodAmount.value||0,mode=mealFoodMode.value,macros=foodMacros(f,amount,mode);mealBuilder.push({foodIndex:mealSelection,name:f.name,amount,mode,macros});renderMealBuilder()}
-function renderMealBuilder(){ingredientCount.textContent=`${mealBuilder.length} ingredient${mealBuilder.length===1?'':'s'}`;let total=zero();mealBuilder.forEach(x=>total=plus(total,x.macros));mealBuilderList.innerHTML=mealBuilder.length?mealBuilder.map((x,i)=>`<div class="ingredient-card"><div class="ingredient-top"><div><strong>${esc(x.name)}</strong><div class="small">${fmt(x.amount)} ${x.mode==='grams'?'g':esc(servingLabel(foods[x.foodIndex]||{}))}</div></div><button class="danger" style="width:auto;padding:7px 9px" onclick="removeIngredient(${i})">Remove</button></div><div class="ingredient-macros">${fmt(x.macros.calories)} kcal · ${fmt(x.macros.protein)}g protein · ${fmt(x.macros.carbs)}g carbs · ${fmt(x.macros.fat)}g fat · ${fmt(x.macros.fibre)}g fibre</div></div>`).join(''):'<div class="empty">Add as many ingredients as you like.</div>';mealBuilderTotals.innerHTML=`<strong>Meal total:</strong> ${fmt(total.calories)} kcal · ${fmt(total.protein)}g protein · ${fmt(total.carbs)}g carbs · ${fmt(total.fat)}g fat · ${fmt(total.fibre)}g fibre`}
+function renderMealBuilder(){ingredientCount.textContent=`${mealBuilder.length} ingredient${mealBuilder.length===1?'':'s'}`;let total=zero();mealBuilder.forEach(x=>total=plus(total,x.macros));mealBuilderList.innerHTML=mealBuilder.length?mealBuilder.map((x,i)=>{const f=foods[x.foodIndex]||{};const amtText=x.mode==='baseunit'?`${fmt(x.amount)} ${esc(f.unit||'unit')}`:(servingLabel(f)?`${fmt(x.amount)} ${esc(servingLabel(f))}`:`${fmt(x.amount)} serving${x.amount===1?'':'s'}`);return `<div class="ingredient-card"><div class="ingredient-top"><div><strong>${esc(x.name)}</strong><div class="small">${amtText}</div></div><button class="danger" style="width:auto;padding:7px 9px" onclick="removeIngredient(${i})">Remove</button></div><div class="ingredient-macros">${energyDisplay(x.macros.calories)} ${energyUnit()} · ${fmt(x.macros.protein)}g protein · ${fmt(x.macros.carbs)}g carbs · ${fmt(x.macros.fat)}g fat · ${fmt(x.macros.fibre)}g fibre</div></div>`}).join(''):'<div class="empty">Add as many ingredients as you like.</div>';mealBuilderTotals.innerHTML=`<strong>Meal total:</strong> ${energyDisplay(total.calories)} ${energyUnit()} · ${fmt(total.protein)}g protein · ${fmt(total.carbs)}g carbs · ${fmt(total.fat)}g fat · ${fmt(total.fibre)}g fibre`}
 function removeIngredient(i){mealBuilder.splice(i,1);renderMealBuilder()}
 function saveMeal(){const name=mealName.value.trim();if(!name)return alert('Enter a meal name.');if(!mealBuilder.length)return alert('Add at least one ingredient.');let total=zero();mealBuilder.forEach(x=>total=plus(total,x.macros));meals.push({name,ingredients:mealBuilder.map(x=>({...x})),macros:total});mealBuilder=[];mealName.value='';saveAll();renderMealBuilder();renderMeals()}
-function renderMeals(){const q=mealSavedSearch.value.trim().toLowerCase();const arr=meals.map((m,i)=>({m,i})).filter(x=>x.m.name.toLowerCase().includes(q));mealsList.innerHTML=arr.length?arr.map(({m,i})=>`<div class="item"><div><div class="item-title">${esc(m.name)}</div><div class="item-sub">${fmt(m.macros.calories)} kcal · ${fmt(m.macros.protein)}g P · ${fmt(m.macros.carbs)}g C · ${fmt(m.macros.fat)}g F · ${fmt(m.macros.fibre)}g fibre</div><div>${m.ingredients.map(x=>`<span class="pill">${esc(x.name)} · ${fmt(x.amount)} ${x.mode==='grams'?'g':esc(servingLabel(foods[x.foodIndex]||{}))}</span>`).join('')}</div></div><div class="item-actions"><button class="danger" onclick="deleteMeal(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved meals found.</div>'}
+function renderMeals(){const q=mealSavedSearch.value.trim().toLowerCase();const arr=meals.map((m,i)=>({m,i})).filter(x=>x.m.name.toLowerCase().includes(q));mealsList.innerHTML=arr.length?arr.map(({m,i})=>`<div class="item"><div><div class="item-title">${esc(m.name)}</div><div class="item-sub">${energyDisplay(m.macros.calories)} ${energyUnit()} · ${fmt(m.macros.protein)}g P · ${fmt(m.macros.carbs)}g C · ${fmt(m.macros.fat)}g F · ${fmt(m.macros.fibre)}g fibre</div></div><div class="item-actions"><button class="danger" onclick="deleteMeal(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved meals found.</div>'}
 function deleteMeal(i){if(confirm('Delete this meal?')){meals.splice(i,1);saveAll();renderMeals()}}
-function loadTargets(){targetCalories.value=targets.calories;targetProtein.value=targets.protein;targetCarbs.value=targets.carbs;targetFat.value=targets.fat;targetFibre.value=targets.fibre;fillQuickGoals()}
-function saveTargets(){targets={calories:+targetCalories.value||1550,protein:+targetProtein.value||110,carbs:+targetCarbs.value||165,fat:+targetFat.value||50,fibre:+targetFibre.value||30};saveAll();fillQuickGoals();renderDiary();alert('Goals saved.')}
-function exportData(){const b=new Blob([JSON.stringify({foods,meals,diary,targets},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='macro-tracker-backup.json';a.click();URL.revokeObjectURL(a.href)}
-function resetAll(){if(confirm('Clear all saved data on this device?')){['macroFoods','macroMeals','macroDiary','macroTargets'].forEach(k=>localStorage.removeItem(k));location.reload()}}
-loadTargets();renderFoods();renderMeals();renderMealBuilder();renderDiary();
+function loadTargets(){settingsEnergyMode.value=displayEnergyMode;targetEnergyLabel.textContent=displayEnergyMode==='kj'?'Energy goal (kJ)':'Calories goal (kcal)';targetCalories.value=displayEnergyMode==='kj'?fmt(targets.calories*KCAL_TO_KJ):targets.calories;targetProtein.value=targets.protein;targetCarbs.value=targets.carbs;targetFat.value=targets.fat;targetFibre.value=targets.fibre;fillQuickGoals()}
+function saveTargets(){targets={calories:displayEnergyMode==='kj'?(+targetCalories.value||0)/KCAL_TO_KJ:(+targetCalories.value||1550),protein:+targetProtein.value||110,carbs:+targetCarbs.value||165,fat:+targetFat.value||50,fibre:+targetFibre.value||30};saveAll();fillQuickGoals();renderDiary();alert('Macro goals saved.')}
+function renderFoodUnits(){foodUnitSelect.innerHTML=[...DEFAULT_UNITS,...customUnits].map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join('')+`<option value="__custom__">+ Custom unit</option>`;renderCustomUnitList()}
+function toggleCustomFoodUnit(){customFoodUnitWrap.style.display=foodUnitSelect.value==='__custom__'?'block':'none'}
+function addCustomFoodUnit(){const u=newFoodUnit.value.trim();if(!u)return;if(!customUnits.includes(u)&&!DEFAULT_UNITS.includes(u))customUnits.push(u);newFoodUnit.value='';saveAll();renderFoodUnits()}
+function renderCustomUnitList(){customUnitList.innerHTML=customUnits.length?customUnits.map(u=>`<span class="pill">${esc(u)}</span>`).join(''):'<span class="small">No custom units added yet.</span>'}
+function renderWaterSettings(){const custom=waterGoalType.value==='custom';waterVolumeUnitWrap.style.display=custom?'none':'block';waterCustomNameWrap.style.display=custom?'block':'none';waterCustomVolumeWrap.style.display=custom?'block':'none'}
+function loadWaterSettings(){waterGoalType.value=waterGoal.type;waterGoalAmount.value=waterGoal.amount;waterVolumeUnit.value=waterGoal.unit||'ml';waterCustomName.value=waterGoal.customName||'';waterCustomVolumeMl.value=waterGoal.customVolumeMl||'';waterStep.value=String(waterGoal.step||0.5);renderWaterSettings()}
+function saveWaterGoal(){waterGoal={type:waterGoalType.value,amount:+waterGoalAmount.value||0,unit:waterVolumeUnit.value,customName:waterCustomName.value.trim()||'bottle',customVolumeMl:+waterCustomVolumeMl.value||null,step:+waterStep.value||0.5};saveAll();renderDiary();alert('Water goal saved.')}
+function renderWaterLogUnits(){if(waterGoal.type==='custom'){waterLogUnit.innerHTML=`<option value="custom">${esc(waterGoal.customName||'container')}</option>`;waterLogAmount.step=waterGoal.step||0.5;waterLogAmount.value=waterGoal.step||0.5}else{waterLogUnit.innerHTML=`<option value="ml">mL</option><option value="l">L</option>`;waterLogAmount.step='0.1';waterLogAmount.value=waterGoal.unit==='l'?0.25:250}}
+function logWater(){const a=+waterLogAmount.value||0;if(a<=0)return;const k=keyFromDate(selectedDate);let add=0;if(waterGoal.type==='custom'){add=a}else{add=waterLogUnit.value==='l'?a*1000:a}waterDiary[k]=(Number(waterDiary[k])||0)+add;saveAll();renderDiary()}
+function exportData(){const b=new Blob([JSON.stringify({foods,meals,diary,waterDiary,targets,waterGoal,customUnits,displayEnergyMode},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='macro-tracker-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function resetAll(){if(confirm('Clear all saved data on this device?')){['macroFoods','macroMeals','macroDiary','macroWaterDiary','macroTargets','macroWaterGoal','macroCustomUnits','macroEnergyMode'].forEach(k=>localStorage.removeItem(k));location.reload()}}
+setEnergyMode('kcal');renderFoodUnits();loadTargets();loadWaterSettings();renderFoods();renderMeals();renderMealBuilder();renderDiary();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}</script>
 </body>
