@@ -38,3 +38,9 @@ RESTORE STEPS
 4. Tap Import backup.
 5. Select your macro-tracker-backup .json file.
 6. Check the summary and confirm.
+
+
+V2.7.1 RESTORE FIX
+- Import now saves restored data first, then reloads the app.
+- Import errors show the actual reason.
+- Compatible with older Macro Tracker backups.

@@ -67,7 +67,7 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 </head>
 <body>
 <div class="shell">
-<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small"><strong>V2.7</strong> · Daily goals, meals & progress</div></header>
+<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small"><strong>V2.7.1</strong> · Daily goals, meals & progress</div></header>
 
 <section id="diaryView" class="view active">
   <div class="card">
@@ -505,46 +505,76 @@ function normalizeImportedMeal(m,i,normalizedFoods){
  };
 }
 function applyImportedBackup(data){
- if(!data||typeof data!=='object')throw new Error('Invalid backup file');
- const importedFoods=Array.isArray(data.foods)?data.foods.map(normalizeImportedFood):[];
+ if(!data || typeof data!=='object') throw new Error('Invalid backup file');
+ if(!Array.isArray(data.foods)) throw new Error('Backup does not contain a foods list');
+
+ const importedFoods=data.foods.map((f,i)=>normalizeImportedFood(f,i));
  const importedMeals=Array.isArray(data.meals)?data.meals.map((m,i)=>normalizeImportedMeal(m,i,importedFoods)):[];
- foods=importedFoods;
- meals=importedMeals;
- diary=(data.diary&&typeof data.diary==='object')?data.diary:{};
- waterDiary=(data.waterDiary&&typeof data.waterDiary==='object')?data.waterDiary:{};
- targets={...targets,...((data.targets&&typeof data.targets==='object')?data.targets:{})};
- waterGoal={...DEFAULT_WATER,...((data.waterGoal&&typeof data.waterGoal==='object')?data.waterGoal:{})};
- delete waterGoal.step;
- customUnits=Array.isArray(data.customUnits)?data.customUnits:[];
- displayEnergyMode=(data.displayEnergyMode||data.energyMode)==='kj'?'kj':'kcal';
+ const importedDiary=(data.diary && typeof data.diary==='object')?data.diary:{};
+ const importedWaterDiary=(data.waterDiary && typeof data.waterDiary==='object')?data.waterDiary:{};
+ const importedTargets=(data.targets && typeof data.targets==='object')?{...DEFAULT_TARGETS,...data.targets}:{...DEFAULT_TARGETS};
+ const importedWaterGoal=(data.waterGoal && typeof data.waterGoal==='object')?{...DEFAULT_WATER,...data.waterGoal}:{...DEFAULT_WATER};
+ delete importedWaterGoal.step;
+ const importedCustomUnits=Array.isArray(data.customUnits)?data.customUnits:[];
+ const importedEnergyMode=(data.displayEnergyMode||data.energyMode)==='kj'?'kj':'kcal';
 
- localStorage.setItem('macroFoods',JSON.stringify(foods));
- localStorage.setItem('macroMeals',JSON.stringify(meals));
- localStorage.setItem('macroDiary',JSON.stringify(diary));
- localStorage.setItem('macroWaterDiary',JSON.stringify(waterDiary));
- localStorage.setItem('macroTargets',JSON.stringify(targets));
- localStorage.setItem('macroWaterGoal',JSON.stringify(waterGoal));
- localStorage.setItem('macroCustomUnits',JSON.stringify(customUnits));
- localStorage.setItem('macroEnergyMode',displayEnergyMode);
+ localStorage.setItem('macroFoods',JSON.stringify(importedFoods));
+ localStorage.setItem('macroMeals',JSON.stringify(importedMeals));
+ localStorage.setItem('macroDiary',JSON.stringify(importedDiary));
+ localStorage.setItem('macroWaterDiary',JSON.stringify(importedWaterDiary));
+ localStorage.setItem('macroTargets',JSON.stringify(importedTargets));
+ localStorage.setItem('macroWaterGoal',JSON.stringify(importedWaterGoal));
+ localStorage.setItem('macroCustomUnits',JSON.stringify(importedCustomUnits));
+ localStorage.setItem('macroEnergyMode',importedEnergyMode);
 
- renderFoodUnits();renderFoods();renderMeals();loadTargets();loadWaterSettings();renderDiary();
+ return {foods:importedFoods.length,meals:importedMeals.length,days:Object.keys(importedDiary).length};
 }
 function importBackupFile(event){
- const file=event.target.files&&event.target.files[0];if(!file)return;
+ const file=event.target.files&&event.target.files[0];
+ if(!file)return;
+
  const reader=new FileReader();
  reader.onload=()=>{
   try{
-   const data=JSON.parse(reader.result);
+   const text=String(reader.result||'').replace(/^\uFEFF/,'').trim();
+   const data=JSON.parse(text);
+
    const fc=Array.isArray(data.foods)?data.foods.length:0;
    const mc=Array.isArray(data.meals)?data.meals.length:0;
    const dc=(data.diary&&typeof data.diary==='object')?Object.keys(data.diary).length:0;
-   if(!confirm(`Restore this backup?\n\n${fc} saved foods\n${mc} saved meals\n${dc} diary day(s)\n\nThis will replace the data currently stored in the app on this device.`)){event.target.value='';return}
-   applyImportedBackup(data);
-   alert(`Backup restored successfully.\n\n${foods.length} foods and ${meals.length} meals are now available.`);
+
+   if(!fc) throw new Error('No saved foods were found in this backup.');
+
+   const ok=confirm(
+    `Restore this Macro Tracker backup?\n\n`+
+    `${fc} saved foods\n${mc} saved meals\n${dc} diary day(s)\n\n`+
+    `This will replace the tracker data currently stored on this device.`
+   );
+   if(!ok){event.target.value='';return}
+
+   const result=applyImportedBackup(data);
+
+   alert(
+    `Backup restored successfully.\n\n`+
+    `${result.foods} foods restored\n`+
+    `${result.meals} meals restored\n\n`+
+    `The app will now reload.`
+   );
+
+   location.reload();
   }catch(err){
-   console.error(err);
-   alert('That backup could not be imported. Please choose a Macro Tracker JSON backup.');
-  }finally{event.target.value=''}
+   console.error('Backup import error:',err);
+   alert(
+    `Import failed: ${err && err.message ? err.message : 'Unknown error'}\n\n`+
+    `Your backup file has not been changed.`
+   );
+  }finally{
+   event.target.value='';
+  }
+ };
+ reader.onerror=()=>{
+   alert('The backup file could not be read by Safari. Please try selecting it again from the Files app.');
+   event.target.value='';
  };
  reader.readAsText(file);
 }
