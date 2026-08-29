@@ -44,3 +44,11 @@ V2.7.1 RESTORE FIX
 - Import now saves restored data first, then reloads the app.
 - Import errors show the actual reason.
 - Compatible with older Macro Tracker backups.
+
+
+V2.7.2 DISPLAY FIX
+- Restored foods now render correctly.
+- Removed stale waterStep and custom serving-name references.
+- Saved-food Edit button restored.
+- Meal ingredient lookup uses stable IDs.
+- If V2.7.1 already imported your backup successfully, you should not need to import it again.

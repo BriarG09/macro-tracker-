@@ -67,7 +67,7 @@ label{display:block;font-size:11px;color:var(--muted);font-weight:750;margin:0 0
 </head>
 <body>
 <div class="shell">
-<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small"><strong>V2.7.1</strong> · Daily goals, meals & progress</div></header>
+<header style="margin-bottom:14px"><h1>Macro Tracker</h1><div class="small"><strong>V2.7.2</strong> · Daily goals, meals & progress</div></header>
 
 <section id="diaryView" class="view active">
   <div class="card">
@@ -417,7 +417,17 @@ function fillQuickGoals(){qCalories.value=displayEnergyMode==='kj'?fmt(targets.c
 function saveQuickGoals(){targets={calories:displayEnergyMode==='kj'?(+qCalories.value||0)/KCAL_TO_KJ:(+qCalories.value||1550),protein:+qProtein.value||110,carbs:+qCarbs.value||165,fat:+qFat.value||50,fibre:+qFibre.value||30};saveAll();loadTargets();renderDiary();quickGoals.style.display='none'}
 function renderDiarySearch(){const q=diarySearch.value.trim().toLowerCase();if(!q){diarySearchResults.style.display='none';return}let o=[];foods.forEach((f,i)=>{if(f.name.toLowerCase().includes(q))o.push({type:'food',i,name:f.name,sub:`${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P`})});meals.forEach((m,i)=>{if(m.name.toLowerCase().includes(q))o.push({type:'meal',i,name:m.name,sub:`Saved meal · ${energyDisplay(m.macros.calories)} ${energyUnit()}`})});diarySearchResults.innerHTML=o.slice(0,20).map(x=>`<div class="search-option" onclick="selectDiary('${x.type}',${x.i})"><strong>${esc(x.name)}</strong><span class="small">${x.sub}</span></div>`).join('')||'<div class="empty">No matches</div>';diarySearchResults.style.display='block'}
 function selectDiary(type,i){diarySelection={type,i};const o=type==='food'?foods[i]:meals[i];diarySelected.style.display='block';diarySelected.innerHTML=`<strong>${esc(o.name)}</strong><div class="small">${type==='food'?`${o.basisAmount} ${esc(o.unit)} nutrition basis`:'Saved meal'}</div>`;diarySearchResults.style.display='none';diarySearch.value='';updateDiaryAmountLabel()}
-function updateDiaryAmountLabel(){if(diarySelection?.type==='food'){const f=foods[diarySelection.i];if(diaryAmountMode.value==='baseunit'){diaryAmountLabel.textContent=`Amount (${f.unit})`}else diaryAmountLabel.textContent=servingLabel(f)?`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`:'Number of servings'}else diaryAmountLabel.textContent='Number of servings'}
+function updateDiaryAmountLabel(){
+ if(diarySelection?.type==='food'){
+  const f=foods[diarySelection.i];
+  if(!f)return;
+  diaryAmountLabel.textContent=diaryAmountMode.value==='baseunit'
+   ?`Amount (${f.unit||'unit'})`
+   :(f.servingSize?`Number of default servings (${fmt(f.servingSize)} ${f.unit||'unit'} each)`:'Number of servings');
+ }else{
+  diaryAmountLabel.textContent='Number of meal servings';
+ }
+}
 function addDiaryEntry(){if(!diarySelection)return alert('Choose a saved food or meal.');const a=+diaryAmount.value||0,mode=diaryAmountMode.value,mealType=diaryMealType.value;let e;if(diarySelection.type==='food'){const f=foods[diarySelection.i];e={name:f.name,macros:foodMacros(f,a,mode)}}else{if(mode==='baseunit')return alert('Saved meals are logged by serving.');const m=meals[diarySelection.i];e={name:m.name,macros:scale(m.macros,a)}}const k=keyFromDate(selectedDate);diary[k]=diary[k]||[];diary[k].push({id:String(Date.now())+Math.random(),mealType,...e});saveAll();renderDiary()}
 function deleteDiaryEntry(id){const k=keyFromDate(selectedDate);diary[k]=(diary[k]||[]).filter(e=>String(e.id)!==String(id));saveAll();renderDiary()}
 function copyPreviousDay(){const d=new Date(selectedDate);d.setDate(d.getDate()-1);const src=diary[keyFromDate(d)]||[];if(!src.length)return alert('No entries on the previous day.');diary[keyFromDate(selectedDate)]=src.map(e=>({...e,id:String(Date.now())+Math.random()}));waterDiary[keyFromDate(selectedDate)]=waterDiary[keyFromDate(d)]||0;saveAll();renderDiary()}
@@ -436,12 +446,57 @@ function editFood(id){
  foodEditStatus.style.display='block';foodEditStatus.textContent=`Editing ${f.name}`;saveFoodBtn.textContent='Update food';cancelFoodEditBtn.style.display='block';window.scrollTo({top:0,behavior:'smooth'});
 }
 function cancelFoodEdit(){editingFoodId.value='';foodEditStatus.style.display='none';saveFoodBtn.textContent='Save food';cancelFoodEditBtn.style.display='none';['foodName','customFoodUnit','foodServingSize','foodEnergy','foodProtein','foodCarbs','foodFat','foodFibre'].forEach(id=>{const e=byId(id);if(e)e.value=''});foodBasisAmount.value=100}
-function renderFoods(){const q=foodSearch.value.trim().toLowerCase();const items=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q));foodsList.innerHTML=items.length?items.map(({f,i})=>`<div class="item"><div><div class="item-title">${esc(f.name)}</div><div class="item-sub">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P · ${fmt(f.carbs)}g C · ${fmt(f.fat)}g F · ${fmt(f.fibre)}g fibre<br>per ${fmt(f.basisAmount)} ${esc(f.unit)}${servingLabel(f)?` · ${esc(servingLabel(f))}${f.servingSize?` = ${fmt(f.servingSize)} ${esc(f.unit)}`:''}`:''}</div></div><div class="item-actions"><button class="danger" onclick="deleteFood(${i})">Delete</button></div></div>`).join(''):'<div class="empty">No saved foods found.</div>'}
-function deleteFood(i){if(confirm('Delete this food?')){foods.splice(i,1);saveAll();renderFoods()}}
-function renderMealSearch(){const q=mealSearch.value.trim().toLowerCase();if(!q){mealSearchResults.style.display='none';return}const arr=foods.map((f,i)=>({f,i})).filter(x=>x.f.name.toLowerCase().includes(q)).slice(0,20);mealSearchResults.innerHTML=arr.map(({f,i})=>`<div class="search-option" onclick="selectMealFood(${i})"><strong>${esc(f.name)}</strong><span class="small">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P</span></div>`).join('')||'<div class="empty">No matches</div>';mealSearchResults.style.display='block'}
-function selectMealFood(i){mealSelection=i;const f=foods[i];mealSelected.style.display='block';mealSelected.innerHTML=`<strong>${esc(f.name)}</strong><div class="small">${fmt(f.basisAmount)} ${esc(f.unit)} nutrition basis</div>`;mealSearchResults.style.display='none';mealSearch.value='';updateMealAmountLabel()}
-function updateMealAmountLabel(){if(mealSelection==null)return;const f=foods[mealSelection];mealAmountLabel.textContent=mealFoodMode.value==='baseunit'?`Amount (${f.unit})`:(servingLabel(f)?`Number of ${servingLabel(f)}${servingLabel(f).endsWith('s')?'':'s'}`:'Number of servings')}
-function addMealIngredient(){if(!mealSelection)return alert('Choose an ingredient.');const f=foods.find(x=>x.id===mealSelection);if(!f)return;const amount=+mealFoodAmount.value||0,mode=mealFoodMode.value;if(amount<=0)return alert('Enter an amount greater than 0.');mealBuilder.push({id:`ing_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,foodId:f.id,name:f.name,amount,mode,unit:f.unit,servingSize:f.servingSize||null,macros:foodMacros(f,amount,mode)});renderMealBuilder()}
+function renderFoods(){
+ const q=(foodSearch.value||'').trim().toLowerCase();
+ const items=foods.filter(f=>(f.name||'').toLowerCase().includes(q));
+ foodsList.innerHTML=items.length?items.map(f=>`
+ <div class="item">
+  <div>
+   <div class="item-title">${esc(f.name)}</div>
+   <div class="item-sub">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P · ${fmt(f.carbs)}g C · ${fmt(f.fat)}g F · ${fmt(f.fibre)}g fibre<br>
+   per ${fmt(f.basisAmount)} ${esc(f.unit||'unit')}${f.servingSize?` · default serving ${fmt(f.servingSize)} ${esc(f.unit||'unit')}`:''}</div>
+  </div>
+  <div class="item-actions">
+   <button class="secondary" onclick="editFood('${f.id}')">Edit</button>
+   <button class="danger" onclick="deleteFood('${f.id}')">Delete</button>
+  </div>
+ </div>`).join(''):'<div class="empty">No saved foods found.</div>';
+}
+function deleteFood(id){
+ if(confirm('Delete this food?')){
+  foods=foods.filter(f=>f.id!==id);
+  saveAll();renderFoods();
+ }
+}
+function renderMealSearch(){
+ const q=(mealSearch.value||'').trim().toLowerCase();
+ if(!q){mealSearchResults.style.display='none';return;}
+ const arr=foods.filter(f=>(f.name||'').toLowerCase().includes(q)).slice(0,20);
+ mealSearchResults.innerHTML=arr.map(f=>`<div class="search-option" onclick="selectMealFood('${f.id}')"><strong>${esc(f.name)}</strong><span class="small">${energyDisplay(f.calories)} ${energyUnit()} · ${fmt(f.protein)}g P</span></div>`).join('')||'<div class="empty">No matches</div>';
+ mealSearchResults.style.display='block';
+}
+function selectMealFood(id){
+ mealSelection=id;
+ const f=foods.find(x=>x.id===id);if(!f)return;
+ mealSelected.style.display='block';
+ mealSelected.innerHTML=`<strong>${esc(f.name)}</strong><div class="small">${fmt(f.basisAmount)} ${esc(f.unit||'unit')} nutrition basis${f.servingSize?` · default serving ${fmt(f.servingSize)} ${esc(f.unit||'unit')}`:''}</div>`;
+ mealSearchResults.style.display='none';mealSearch.value='';updateMealAmountLabel();
+}
+function updateMealAmountLabel(){
+ if(!mealSelection)return;
+ const f=foods.find(x=>x.id===mealSelection);if(!f)return;
+ mealAmountLabel.textContent=mealFoodMode.value==='baseunit'
+  ?`Amount (${f.unit||'unit'})`
+  :(f.servingSize?`Number of default servings (${fmt(f.servingSize)} ${f.unit||'unit'} each)`:'Number of servings');
+}
+function addMealIngredient(){
+ if(!mealSelection)return alert('Choose an ingredient.');
+ const f=foods.find(x=>x.id===mealSelection);if(!f)return alert('That saved food could not be found.');
+ const amount=+mealFoodAmount.value||0,mode=mealFoodMode.value;
+ if(amount<=0)return alert('Enter an amount greater than 0.');
+ mealBuilder.push({id:`ing_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,foodId:f.id,name:f.name,amount,mode,unit:f.unit,servingSize:f.servingSize||null,macros:foodMacros(f,amount,mode)});
+ renderMealBuilder();
+}
 function ingredientFood(x){return foods.find(f=>f.id===x.foodId)||null}
 function recalcIngredient(x){const f=ingredientFood(x);if(f){x.name=f.name;x.unit=f.unit;x.servingSize=f.servingSize||null;x.macros=foodMacros(f,x.amount,x.mode)}return x}
 function changeIngredientAmount(id,v){const x=mealBuilder.find(i=>i.id===id);if(!x)return;x.amount=Math.max(0,Number(v)||0);recalcIngredient(x);renderMealBuilder()}
@@ -464,9 +519,29 @@ function toggleCustomFoodUnit(){customFoodUnitWrap.style.display=foodUnitSelect.
 function addCustomFoodUnit(){const u=newFoodUnit.value.trim();if(!u)return;if(!customUnits.includes(u)&&!DEFAULT_UNITS.includes(u))customUnits.push(u);newFoodUnit.value='';saveAll();renderFoodUnits()}
 function renderCustomUnitList(){customUnitList.innerHTML=customUnits.length?customUnits.map(u=>`<span class="pill">${esc(u)}</span>`).join(''):'<span class="small">No custom units added yet.</span>'}
 function renderWaterSettings(){const custom=waterGoalType.value==='custom';waterVolumeUnitWrap.style.display=custom?'none':'block';waterCustomNameWrap.style.display=custom?'block':'none';waterCustomVolumeWrap.style.display=custom?'block':'none'}
-function loadWaterSettings(){waterGoalType.value=waterGoal.type;waterGoalAmount.value=waterGoal.amount;waterVolumeUnit.value=waterGoal.unit||'ml';waterCustomName.value=waterGoal.customName||'';waterCustomVolumeMl.value=waterGoal.customVolumeMl||'';waterStep.value=String(waterGoal.step||0.5);renderWaterSettings()}
-function saveWaterGoal(){waterGoal={type:waterGoalType.value,amount:+waterGoalAmount.value||0,unit:waterVolumeUnit.value,customName:waterCustomName.value.trim()||'bottle',customVolumeMl:+waterCustomVolumeMl.value||null,step:+waterStep.value||0.5};saveAll();renderDiary();alert('Water goal saved.')}
-function renderWaterLogUnits(){if(waterGoal.type==='custom'){waterLogUnit.innerHTML=`<option value="custom">${esc(waterGoal.customName||'container')}</option>`;waterLogAmount.step=waterGoal.step||0.5;waterLogAmount.value=waterGoal.step||0.5}else{waterLogUnit.innerHTML=`<option value="ml">mL</option><option value="l">L</option>`;waterLogAmount.step='0.1';waterLogAmount.value=waterGoal.unit==='l'?0.25:250}}
+function loadWaterSettings(){
+ waterGoalType.value=waterGoal.type||'volume';
+ waterGoalAmount.value=waterGoal.amount||2000;
+ waterVolumeUnit.value=waterGoal.unit||'ml';
+ waterCustomName.value=waterGoal.customName||'';
+ waterCustomVolumeMl.value=waterGoal.customVolumeMl||'';
+ renderWaterSettings();
+}
+function saveWaterGoal(){
+ waterGoal={type:waterGoalType.value,amount:+waterGoalAmount.value||0,unit:waterVolumeUnit.value,customName:waterCustomName.value.trim()||'bottle',customVolumeMl:+waterCustomVolumeMl.value||null};
+ saveAll();renderDiary();alert('Water goal saved.');
+}
+function renderWaterLogUnits(){
+ if(waterGoal.type==='custom'){
+  waterLogUnit.innerHTML=`<option value="custom">${esc(waterGoal.customName||'container')}</option>`;
+  waterLogAmount.step='0.1';
+  if(!waterLogAmount.value)waterLogAmount.value=0.5;
+ }else{
+  waterLogUnit.innerHTML='<option value="ml">mL</option><option value="l">L</option>';
+  waterLogAmount.step='0.1';
+  if(!waterLogAmount.value)waterLogAmount.value=waterGoal.unit==='l'?0.25:250;
+ }
+}
 function logWater(){const a=+waterLogAmount.value||0;if(a<=0)return;const k=keyFromDate(selectedDate);let add=0;if(waterGoal.type==='custom'){add=a}else{add=waterLogUnit.value==='l'?a*1000:a}waterDiary[k]=(Number(waterDiary[k])||0)+add;saveAll();renderDiary()}
 
 function normalizeImportedFood(f,i){
